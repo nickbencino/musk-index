@@ -1,0 +1,397 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0d0d0d;
+  --bg-panel: #1a1a1a;
+  --bg-row: #0d0d0d;
+  --bg-row-alt: #141414;
+  --bg-hover: #1f2937;
+  --text: #f5f5f5;
+  --text-dim: #737373;
+  --orange: #ff6600;
+  --amber: #ffb000;
+  --green: #00ff41;
+  --red: #ff3b3b;
+  --blue: #4da6ff;
+  --border: #2a2a2a;
+}
+
+body {
+  font-family: 'Bloomberg Terminal', 'Consolas', 'Monaco', 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.4;
+  font-size: 13px;
+  zoom: 1.4;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header - Bloomberg style top bar */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--orange);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.elon-worth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+}
+
+.elon-worth .label {
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.elon-worth .value {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--amber);
+}
+
+/* Elon face icon */
+.elon-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* Main content */
+main {
+  padding: 16px;
+}
+
+/* Hero - minimal Bloomberg style */
+.hero {
+  text-align: left;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.hero .highlight {
+  color: var(--amber);
+}
+
+.tagline {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Filters - Bloomberg button row */
+.filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+}
+
+.filter-btn {
+  background: #000;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s;
+}
+
+.filter-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.filter-btn.active {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #000;
+  font-weight: bold;
+}
+
+/* Stats row - Bloomberg data boxes */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 12px 20px;
+  min-width: 150px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--amber);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Search - Bloomberg input */
+.search-bar {
+  margin-bottom: 16px;
+}
+
+#search {
+  width: 300px;
+  background: #000;
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+}
+
+#search::placeholder {
+  color: var(--text-dim);
+}
+
+#search:focus {
+  border-color: var(--orange);
+}
+
+/* Table - Bloomberg data grid */
+.table-wrap {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #000;
+}
+
+th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--orange);
+  border-bottom: 2px solid var(--orange);
+}
+
+th.sortable {
+  cursor: pointer;
+}
+
+th.sortable:hover {
+  color: var(--amber);
+}
+
+.col-rank { width: 50px; text-align: center; }
+.col-elons { text-align: right; }
+.col-mcap { text-align: right; }
+.col-price { text-align: right; }
+.col-change { text-align: right; width: 90px; }
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tr:nth-child(even) td {
+  background: var(--bg-row-alt);
+}
+
+tr:hover td {
+  background: var(--bg-hover);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-dim);
+}
+
+/* Asset cell */
+.asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.asset-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.asset-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.asset-logo .emoji {
+  font-size: 14px;
+}
+
+.asset-logo .letter {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--text-dim);
+}
+
+.asset-info .name {
+  font-weight: bold;
+  color: var(--text);
+}
+
+.asset-info .symbol {
+  font-size: 11px;
+  color: var(--blue);
+}
+
+.type-tag {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 6px;
+  border: 1px solid;
+}
+
+.type-tag.stock { border-color: var(--blue); color: var(--blue); }
+.type-tag.crypto { border-color: #a855f7; color: #a855f7; }
+.type-tag.metal { border-color: var(--amber); color: var(--amber); }
+.type-tag.etf { border-color: var(--green); color: var(--green); }
+
+/* Values */
+.rank {
+  font-weight: bold;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.elons-value {
+  text-align: right;
+  font-weight: bold;
+  color: var(--amber);
+}
+
+.mcap-value, .price-value {
+  text-align: right;
+  color: var(--text);
+  font-family: 'Consolas', monospace;
+}
+
+.change-value {
+  text-align: right;
+  font-weight: bold;
+  font-family: 'Consolas', monospace;
+}
+
+.change-value.positive { color: var(--green); }
+.change-value.negative { color: var(--red); }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-dim);
+  font-size: 11px;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+.disclaimer {
+  margin-top: 4px;
+  color: var(--orange);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-row {
+    flex-wrap: wrap;
+  }
+  
+  .stat {
+    min-width: 100px;
+  }
+  
+  .col-mcap, .col-price {
+    display: none;
+  }
+  
+  #search {
+    width: 100%;
+  }
+}
