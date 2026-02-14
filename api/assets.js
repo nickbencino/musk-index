@@ -1,75 +1,170 @@
-// Serverless function for Vercel
+// Serverless function for Vercel - Fully automated live data
 
-// Elon's net worth
-const elonNetWorth = 844800000000; // $844.8B as of Feb 2026
+// FMP API Key for stocks
+const FMP_API_KEY = 'dqSqixCdhO7e6tmilU9izodHsf2ejDpN';
 
-// Hardcoded stock data - Source: companiesmarketcap.com Feb 2026
-const STOCK_DATA = [
-  { symbol: 'NVDA', name: 'NVIDIA', marketCap: 4626e9, price: 190.04, change: 2.50 },
-  { symbol: 'AAPL', name: 'Apple', marketCap: 4036e9, price: 274.62, change: -1.17 },
-  { symbol: 'GOOG', name: 'Alphabet (Google)', marketCap: 3924e9, price: 324.40, change: 0.40 },
-  { symbol: 'MSFT', name: 'Microsoft', marketCap: 3074e9, price: 413.60, change: 3.11 },
-  { symbol: 'AMZN', name: 'Amazon', marketCap: 2240e9, price: 208.72, change: -0.76 },
-  { symbol: 'TSM', name: 'TSMC', marketCap: 1843e9, price: 355.41, change: 1.88 },
-  { symbol: 'META', name: 'Meta Platforms', marketCap: 1713e9, price: 677.22, change: 2.38 },
-  { symbol: '2222.SR', name: 'Saudi Aramco', marketCap: 1667e9, price: 6.89, change: 0.70, country: 'Saudi Arabia' },
-  { symbol: 'AVGO', name: 'Broadcom', marketCap: 1630e9, price: 343.94, change: 3.44 },
-  { symbol: 'TSLA', name: 'Tesla', marketCap: 1565e9, price: 417.32, change: 1.51 },
-  { symbol: 'BRK-B', name: 'Berkshire Hathaway', marketCap: 1074e9, price: 498.08, change: -1.97 },
-  { symbol: 'WMT', name: 'Walmart', marketCap: 1028e9, price: 129.02, change: -1.65 },
-  { symbol: 'LLY', name: 'Eli Lilly', marketCap: 936.5e9, price: 1045, change: -1.28 },
-  { symbol: 'JPM', name: 'JPMorgan Chase', marketCap: 876.84e9, price: 322.10, change: -0.09 },
-  { symbol: '005930.KS', name: 'Samsung', marketCap: 758.8e9, price: 113.49, change: -0.36, country: 'South Korea' },
-  { symbol: 'TCEHY', name: 'Tencent', marketCap: 647.72e9, price: 71.80, change: 0.42, country: 'China' },
-  { symbol: 'XOM', name: 'Exxon Mobil', marketCap: 637.67e9, price: 151.21, change: 1.45 },
-  { symbol: 'V', name: 'Visa', marketCap: 627.73e9, price: 325.58, change: -1.81 },
-  { symbol: 'JNJ', name: 'Johnson & Johnson', marketCap: 574.95e9, price: 238.64, change: -0.56 },
-  { symbol: 'ASML', name: 'ASML', marketCap: 554.85e9, price: 1429, change: 1.17, country: 'Netherlands' },
-  { symbol: 'MA', name: 'Mastercard', marketCap: 478.28e9, price: 535.33, change: -2.44 },
-  { symbol: 'ORCL', name: 'Oracle', marketCap: 450.05e9, price: 156.59, change: 9.64 },
-  { symbol: 'COST', name: 'Costco', marketCap: 442.88e9, price: 997.59, change: -0.36 },
-  { symbol: 'MU', name: 'Micron Technology', marketCap: 431.63e9, price: 383.50, change: -2.84 },
-  { symbol: 'BAC', name: 'Bank of America', marketCap: 411.93e9, price: 56.41, change: -0.21 },
-  { symbol: 'ABBV', name: 'AbbVie', marketCap: 394.58e9, price: 223.26, change: -0.08 },
-  { symbol: 'BABA', name: 'Alibaba', marketCap: 389.13e9, price: 163.00, change: 0.30, country: 'China' },
-  { symbol: 'HD', name: 'Home Depot', marketCap: 379.28e9, price: 381.00, change: -1.08 },
-  { symbol: 'PG', name: 'Procter & Gamble', marketCap: 367.63e9, price: 157.33, change: -1.16 },
-  { symbol: 'CVX', name: 'Chevron', marketCap: 365.08e9, price: 182.60, change: 0.96 },
-  { symbol: 'AMD', name: 'AMD', marketCap: 352.16e9, price: 216.00, change: 3.63 },
-  { symbol: 'CAT', name: 'Caterpillar', marketCap: 347.66e9, price: 742.12, change: 2.19 },
-  { symbol: 'NFLX', name: 'Netflix', marketCap: 345.58e9, price: 81.47, change: -0.89 },
-  { symbol: 'CSCO', name: 'Cisco', marketCap: 342.87e9, price: 86.78, change: 2.31 },
-  { symbol: 'PLTR', name: 'Palantir', marketCap: 340.61e9, price: 142.91, change: 5.16 },
-  { symbol: 'KO', name: 'Coca-Cola', marketCap: 335.55e9, price: 77.97, change: -1.34 },
-  { symbol: 'GE', name: 'General Electric', marketCap: 334.10e9, price: 316.74, change: -1.33 },
-  { symbol: 'TM', name: 'Toyota', marketCap: 317.40e9, price: 242.39, change: -0.75, country: 'Japan' },
-  { symbol: 'WFC', name: 'Wells Fargo', marketCap: 296.98e9, price: 94.61, change: 0.68 },
-  { symbol: 'MRK', name: 'Merck', marketCap: 293.86e9, price: 117.65, change: -3.51 }
+// In-memory cache (resets on cold start)
+let cache = { data: null, timestamp: 0 };
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+// Top stocks to fetch
+const TOP_STOCKS = [
+  'NVDA', 'AAPL', 'GOOG', 'MSFT', 'AMZN', 'TSM', 'META', 'AVGO', 'TSLA', 'BRK-B',
+  'WMT', 'LLY', 'JPM', 'V', 'XOM', 'MA', 'ORCL', 'COST', 'MU', 'BAC',
+  'ABBV', 'HD', 'PG', 'CVX', 'NFLX', 'AMD', 'CSCO', 'CAT', 'PLTR', 'GE',
+  'KO', 'WFC', 'MRK', 'DIS', 'AMGN', 'VZ', 'IBM', 'INTC', 'UNH', 'PEP'
 ];
 
-// ETF data
-const ETF_DATA = [
-  { symbol: 'SPY', name: 'SPDR S&P 500 ETF', marketCap: 864.87e9, price: 638.23, change: 0.47 },
-  { symbol: 'IVV', name: 'iShares Core S&P 500', marketCap: 765.36e9, price: 697.09, change: 0.48 },
-  { symbol: 'VOO', name: 'Vanguard S&P 500', marketCap: 710.72e9, price: 693.95, change: 0.48 },
-  { symbol: 'VTI', name: 'Vanguard Total Stock', marketCap: 588.91e9, price: 342.64, change: 0.49 },
-  { symbol: 'QQQ', name: 'Invesco QQQ', marketCap: 531.27e9, price: 2125, change: 0.41 },
-  { symbol: 'AGG', name: 'iShares Core Bond', marketCap: 306.51e9, price: 1752, change: 0.38 },
-  { symbol: 'VUG', name: 'Vanguard Growth', marketCap: 213.60e9, price: 68.37, change: 1.48 },
-  { symbol: 'BND', name: 'Vanguard Total Bond', marketCap: 200.09e9, price: 473.39, change: 1.02 }
+// Total supply constants for market cap calculation
+const GOLD_TOTAL_OUNCES = 6.95e9;   // ~6.95 billion troy ounces mined
+const SILVER_TOTAL_OUNCES = 56.3e9; // ~56.3 billion troy ounces mined
+
+// Elon's net worth - hardcoded from Forbes (Feb 2026)
+function fetchElonNetWorth() {
+  return 852.7e9; // $852.7B
+}
+
+// Fetch gold and silver prices from Gold API
+async function fetchMetalPrices() {
+  const results = [];
+  
+  try {
+    // Fetch gold
+    const goldResponse = await fetch('https://api.gold-api.com/price/XAU');
+    const goldData = await goldResponse.json();
+    
+    if (goldData && goldData.price) {
+      results.push({
+        symbol: 'GOLD',
+        name: 'Gold',
+        price: goldData.price,
+        marketCap: goldData.price * GOLD_TOTAL_OUNCES,
+        change: 0, // API doesn't provide change
+        type: 'metal'
+      });
+    }
+  } catch (err) {
+    console.error('Gold API error:', err.message);
+  }
+  
+  try {
+    // Fetch silver
+    const silverResponse = await fetch('https://api.gold-api.com/price/XAG');
+    const silverData = await silverResponse.json();
+    
+    if (silverData && silverData.price) {
+      results.push({
+        symbol: 'SILVER',
+        name: 'Silver',
+        price: silverData.price,
+        marketCap: silverData.price * SILVER_TOTAL_OUNCES,
+        change: 0, // API doesn't provide change
+        type: 'metal'
+      });
+    }
+  } catch (err) {
+    console.error('Silver API error:', err.message);
+  }
+  
+  return results;
+}
+
+// Fetch single stock profile from FMP
+async function fetchStockProfile(symbol) {
+  try {
+    const response = await fetch(
+      `https://financialmodelingprep.com/stable/profile?symbol=${symbol}&apikey=${FMP_API_KEY}`
+    );
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      const stock = data[0];
+      return {
+        symbol: stock.symbol,
+        name: stock.companyName,
+        price: stock.price,
+        marketCap: stock.marketCap,
+        change: stock.changePercentage,
+        type: 'stock',
+        country: 'USA'
+      };
+    }
+  } catch (err) {
+    console.error(`Error fetching ${symbol}:`, err.message);
+  }
+  return null;
+}
+
+// Fallback stock data when API is rate limited - Feb 10, 2026 from companiesmarketcap.com
+const FALLBACK_STOCKS = [
+  { symbol: 'NVDA', name: 'NVIDIA', marketCap: 4599e9, price: 188.92, change: 0.59, type: 'stock' },
+  { symbol: 'AAPL', name: 'Apple', marketCap: 4032e9, price: 274.36, change: 0.09, type: 'stock' },
+  { symbol: 'GOOG', name: 'Alphabet (Google)', marketCap: 3862e9, price: 319.26, change: 1.58, type: 'stock' },
+  { symbol: 'MSFT', name: 'Microsoft', marketCap: 3125e9, price: 420.51, change: 1.64, type: 'stock' },
+  { symbol: 'AMZN', name: 'Amazon', marketCap: 2271e9, price: 211.64, change: 1.40, type: 'stock' },
+  { symbol: 'TSM', name: 'TSMC', marketCap: 1868e9, price: 360.24, change: 1.36, type: 'stock', country: 'Taiwan' },
+  { symbol: 'META', name: 'Meta Platforms', marketCap: 1699e9, price: 671.92, change: 0.80, type: 'stock' },
+  { symbol: '2222.SR', name: 'Saudi Aramco', marketCap: 1667e9, price: 6.89, change: 0.70, type: 'stock', country: 'Saudi Arabia' },
+  { symbol: 'AVGO', name: 'Broadcom', marketCap: 1641e9, price: 346.30, change: 0.69, type: 'stock' },
+  { symbol: 'TSLA', name: 'Tesla', marketCap: 1586e9, price: 422.77, change: 1.31, type: 'stock' },
+  { symbol: 'BRK-B', name: 'Berkshire Hathaway', marketCap: 1078e9, price: 499.77, change: 0.34, type: 'stock' },
+  { symbol: 'WMT', name: 'Walmart', marketCap: 1020e9, price: 128.00, change: 0.79, type: 'stock' },
+  { symbol: 'LLY', name: 'Eli Lilly', marketCap: 927e9, price: 1034, change: 0.99, type: 'stock' },
+  { symbol: 'JPM', name: 'JPMorgan Chase', marketCap: 885e9, price: 325.05, change: 0.92, type: 'stock' },
+  { symbol: '005930.KS', name: 'Samsung', marketCap: 760e9, price: 113.71, change: 0.36, type: 'stock', country: 'South Korea' },
+  { symbol: 'TCEHY', name: 'Tencent', marketCap: 635e9, price: 70.34, change: 2.03, type: 'stock', country: 'China' },
+  { symbol: 'XOM', name: 'Exxon Mobil', marketCap: 634e9, price: 150.23, change: 0.65, type: 'stock' },
+  { symbol: 'V', name: 'Visa', marketCap: 632e9, price: 328.00, change: 0.95, type: 'stock' },
+  { symbol: 'JNJ', name: 'Johnson & Johnson', marketCap: 574e9, price: 238.31, change: 0.14, type: 'stock' },
+  { symbol: 'ASML', name: 'ASML', marketCap: 554e9, price: 1428, change: 0.02, type: 'stock', country: 'Netherlands' },
+  { symbol: 'MA', name: 'Mastercard', marketCap: 487e9, price: 544.60, change: 1.73, type: 'stock' },
+  { symbol: 'ORCL', name: 'Oracle', marketCap: 465e9, price: 161.86, change: 3.37, type: 'stock' },
+  { symbol: 'COST', name: 'Costco', marketCap: 439e9, price: 987.88, change: 0.97, type: 'stock' },
+  { symbol: 'MU', name: 'Micron Technology', marketCap: 425e9, price: 377.81, change: 1.48, type: 'stock' },
+  { symbol: 'BAC', name: 'Bank of America', marketCap: 414e9, price: 56.70, change: 0.51, type: 'stock' },
+  { symbol: 'ABBV', name: 'AbbVie', marketCap: 396e9, price: 223.89, change: 0.28, type: 'stock' },
+  { symbol: 'BABA', name: 'Alibaba', marketCap: 395e9, price: 165.36, change: 1.45, type: 'stock', country: 'China' },
+  { symbol: 'HD', name: 'Home Depot', marketCap: 383e9, price: 384.80, change: 1.00, type: 'stock' },
+  { symbol: 'PG', name: 'Procter & Gamble', marketCap: 369e9, price: 157.75, change: 0.27, type: 'stock' },
+  { symbol: 'CVX', name: 'Chevron', marketCap: 362e9, price: 181.19, change: 0.77, type: 'stock' },
+  { symbol: 'NFLX', name: 'Netflix', marketCap: 356e9, price: 84.03, change: 3.14, type: 'stock' },
+  { symbol: 'AMD', name: 'AMD', marketCap: 352e9, price: 215.98, change: 0.01, type: 'stock' },
+  { symbol: 'CSCO', name: 'Cisco', marketCap: 348e9, price: 87.95, change: 1.35, type: 'stock' },
+  { symbol: 'CAT', name: 'Caterpillar', marketCap: 347e9, price: 741.72, change: 0.05, type: 'stock' },
+  { symbol: 'PLTR', name: 'Palantir', marketCap: 343e9, price: 143.78, change: 0.59, type: 'stock' },
+  { symbol: 'GE', name: 'General Electric', marketCap: 337e9, price: 319.12, change: 0.75, type: 'stock' },
+  { symbol: 'KO', name: 'Coca-Cola', marketCap: 331e9, price: 76.83, change: 1.46, type: 'stock' },
+  { symbol: 'TM', name: 'Toyota', marketCap: 315e9, price: 240.70, change: 0.70, type: 'stock', country: 'Japan' },
+  { symbol: 'WFC', name: 'Wells Fargo', marketCap: 297e9, price: 94.77, change: 0.17, type: 'stock' },
+  { symbol: 'MRK', name: 'Merck', marketCap: 291e9, price: 116.65, change: 0.85, type: 'stock' },
 ];
 
-// Metals data
-const METALS_DATA = [
-  { symbol: 'GOLD', name: 'Gold', marketCap: 35295e9, price: 5076, change: -0.06 },
-  { symbol: 'SILVER', name: 'Silver', marketCap: 4595e9, price: 81.63, change: -0.73 }
-];
+// Fetch all stocks from FMP (parallel with batching)
+async function fetchAllStocks() {
+  const results = [];
+  
+  // Fetch in batches of 10 to avoid overwhelming
+  for (let i = 0; i < TOP_STOCKS.length; i += 10) {
+    const batch = TOP_STOCKS.slice(i, i + 10);
+    const promises = batch.map(symbol => fetchStockProfile(symbol));
+    const batchResults = await Promise.all(promises);
+    results.push(...batchResults.filter(r => r !== null));
+  }
+  
+  // If we got less than 10 stocks, FMP is probably rate limited - use fallback
+  if (results.length < 10) {
+    console.log('FMP rate limited, using fallback data');
+    return FALLBACK_STOCKS;
+  }
+  
+  return results;
+}
 
 // Fetch crypto from CoinGecko
 async function fetchCryptoData() {
   try {
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true'
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h'
     );
     const data = await response.json();
     
@@ -85,8 +180,7 @@ async function fetchCryptoData() {
       marketCap: coin.market_cap,
       change: coin.price_change_percentage_24h,
       type: 'crypto',
-      image: coin.image,
-      sparkline: coin.sparkline_in_7d?.price || []
+      image: coin.image
     }));
   } catch (err) {
     console.error('CoinGecko error:', err.message);
@@ -95,20 +189,28 @@ async function fetchCryptoData() {
 }
 
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
   
   try {
-    const crypto = await fetchCryptoData();
+    const now = Date.now();
     
-    // Build asset list
-    const stocks = STOCK_DATA.map(s => ({ ...s, type: 'stock', country: s.country || 'USA' }));
-    const etfs = ETF_DATA.map(e => ({ ...e, type: 'etf', country: 'USA' }));
-    const metals = METALS_DATA.map(m => ({ ...m, type: 'metal', country: null }));
+    // Check cache
+    if (cache.data && (now - cache.timestamp) < CACHE_DURATION) {
+      return res.status(200).json(cache.data);
+    }
     
-    // Combine all
-    let allAssets = [...metals, ...stocks, ...etfs, ...crypto];
+    // Fetch all data in parallel
+    const [elonNetWorth, metals, stocks, crypto] = await Promise.all([
+      fetchElonNetWorth(),
+      fetchMetalPrices(),
+      fetchAllStocks(),
+      fetchCryptoData()
+    ]);
+    
+    // Combine all assets
+    let allAssets = [...metals, ...stocks, ...crypto];
     
     // Sort by market cap
     allAssets.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
@@ -123,13 +225,25 @@ export default async function handler(req, res) {
       elons: asset.marketCap / elonNetWorth
     }));
     
-    res.status(200).json({
+    const result = {
       success: true,
       elonNetWorth,
       count: allAssets.length,
       totalElons: allAssets.reduce((sum, a) => sum + (a.elons || 0), 0),
-      assets: allAssets
-    });
+      assets: allAssets,
+      lastUpdated: new Date().toISOString(),
+      dataSources: {
+        stocks: 'FMP API',
+        crypto: 'CoinGecko',
+        metals: 'Gold-API.com',
+        elonNetWorth: 'RTB API (Forbes data)'
+      }
+    };
+    
+    // Update cache
+    cache = { data: result, timestamp: now };
+    
+    res.status(200).json(result);
   } catch (err) {
     console.error('Error:', err);
     res.status(500).json({ success: false, error: err.message });

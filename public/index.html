@@ -3,17 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MUSK INDEX | Global Asset Terminal</title>
+  <title>MUSK UNITS | Global Asset Terminal</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="logo">
         <img class="logo-icon" src="img/elon.png" alt="Elon" style="width:32px;height:32px;border-radius:4px;">
-        <span class="logo-text">MUSK INDEX</span>
+        <span class="logo-text">MUSK UNITS</span>
       </div>
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="index">INDEX</button>
+        <button class="tab-btn" data-tab="debt">US DEBT</button>
+        <button class="tab-btn" data-tab="holders">TREASURY HOLDERS</button>
+        <button class="tab-btn" data-tab="gold">GOLD RESERVES</button>
+        <button class="tab-btn" data-tab="calculator">CALCULATOR</button>
+        <a href="news.html" class="tab-btn tab-link">NEWS</a>
+      </nav>
       <div class="elon-worth">
         <span class="label">1 MU =</span>
         <span class="value" id="elon-value">$---B</span>
@@ -21,6 +30,311 @@
     </header>
 
     <main>
+      <!-- Holders Tab -->
+      <section id="holders-tab" class="tab-content" style="display:none;">
+        <div class="hero">
+          <h1>Treasury Holdings <span class="highlight">[BY COUNTRY]</span></h1>
+          <p class="tagline">Foreign ownership of US Treasury securities in Musk Units</p>
+        </div>
+        
+        <div class="explainer-box">
+          <div class="explainer-title">📊 What is this?</div>
+          <div class="explainer-content">
+            <p><strong>Treasury bonds are IOUs from the US government.</strong> When countries buy them, they're essentially lending money to America. In return, they earn interest and hold a "safe" asset backed by the US economy.</p>
+            <p><strong>Why it matters:</strong> Foreign demand for US debt keeps American borrowing costs low. When countries sell treasuries, it can push up interest rates and weaken the dollar. A country dumping treasuries is a vote of no confidence in US fiscal health.</p>
+            <p><strong>The trend:</strong> Several nations (notably China) have been reducing their treasury holdings while increasing gold reserves. This "de-dollarization" shifts power away from the US-dominated financial system.</p>
+          </div>
+        </div>
+        
+        <div class="holders-container">
+          <div class="holders-controls">
+            <select id="country-select">
+              <option value="__TOTAL__">All Countries (Total)</option>
+              <optgroup label="BRICS+">
+                <option value="__BRICS_TOTAL__">BRICS+ Total (Combined)</option>
+                <option value="Brazil">Brazil</option>
+                <option value="Russia">Russia</option>
+                <option value="India">India</option>
+                <option value="China, Mainland">China</option>
+                <option value="South Africa">South Africa</option>
+                <option value="Egypt">Egypt</option>
+                <option value="United Arab Emirates">UAE</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
+              </optgroup>
+              <optgroup label="Major Holders">
+                <option value="Japan">Japan</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Luxembourg">Luxembourg</option>
+                <option value="Canada">Canada</option>
+                <option value="Ireland">Ireland</option>
+                <option value="Belgium">Belgium</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="Cayman Islands">Cayman Islands</option>
+                <option value="Taiwan">Taiwan</option>
+                <option value="France">France</option>
+                <option value="Hong Kong">Hong Kong</option>
+                <option value="Singapore">Singapore</option>
+              </optgroup>
+            </select>
+            <div class="time-range">
+              <button class="range-btn" data-range="1">1Y</button>
+              <button class="range-btn" data-range="5">5Y</button>
+              <button class="range-btn active" data-range="10">10Y</button>
+              <button class="range-btn" data-range="max">MAX</button>
+            </div>
+          </div>
+          
+          <div class="holders-summary">
+            <div class="holder-stat">
+              <span class="holder-stat-label">CURRENT HOLDINGS</span>
+              <span class="holder-stat-value" id="holder-current">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">IN MUSK UNITS</span>
+              <span class="holder-stat-value holder-mu" id="holder-mu">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">PEAK HOLDINGS</span>
+              <span class="holder-stat-value" id="holder-peak">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">CHANGE FROM PEAK</span>
+              <span class="holder-stat-value" id="holder-change">--</span>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="holders-chart"></canvas>
+          </div>
+          
+          <div class="holders-note">
+            <p>Source: U.S. Department of the Treasury | TIC Data | Updated Monthly</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gold Tab -->
+      <section id="gold-tab" class="tab-content" style="display:none;">
+        <div class="hero">
+          <h1>Gold Reserves <span class="highlight">[BY COUNTRY]</span></h1>
+          <p class="tagline">Central bank gold holdings in tonnes and Musk Units</p>
+        </div>
+        
+        <div class="explainer-box">
+          <div class="explainer-title">🥇 What is this?</div>
+          <div class="explainer-content">
+            <p><strong>Gold reserves are physical gold held by central banks.</strong> Unlike treasury bonds, gold has no counterparty risk. It's not an IOU from any government. It's been a store of value for thousands of years.</p>
+            <p><strong>Why it matters:</strong> Countries hold gold as a hedge against currency collapse and geopolitical instability. When nations lose trust in the dollar-based system, they often turn to gold as a neutral reserve asset.</p>
+            <p><strong>The trend:</strong> BRICS+ nations have been aggressively accumulating gold while reducing dollar assets. Use the "Overlay Treasury Holdings" toggle to see this pattern. When gold goes up and treasuries go down, it signals a shift away from US financial dominance.</p>
+          </div>
+        </div>
+        
+        <div class="holders-container">
+          <div class="holders-controls">
+            <select id="gold-country-select">
+              <optgroup label="BRICS+">
+                <option value="__BRICS_TOTAL__">BRICS+ Total (Combined)</option>
+                <option value="Brazil">Brazil</option>
+                <option value="Russian Federation">Russia</option>
+                <option value="India">India</option>
+                <option value="China">China</option>
+                <option value="South Africa">South Africa</option>
+                <option value="Egypt">Egypt</option>
+                <option value="United Arab Emirates">UAE</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
+              </optgroup>
+              <optgroup label="Major Holders">
+                <option value="United States of America">United States</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Italy">Italy</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="Japan">Japan</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Turkey">Turkey</option>
+                <option value="Poland">Poland</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Taiwan, China">Taiwan</option>
+              </optgroup>
+            </select>
+            <div class="time-range">
+              <button class="range-btn gold-range" data-range="5">5Y</button>
+              <button class="range-btn gold-range active" data-range="10">10Y</button>
+              <button class="range-btn gold-range" data-range="max">MAX</button>
+            </div>
+            <select id="gold-display-mode" class="display-mode-select">
+              <option value="tonnes">Tonnes</option>
+              <option value="usd">USD Value</option>
+            </select>
+            <label class="overlay-toggle">
+              <input type="checkbox" id="treasury-overlay"> 
+              <span>Overlay Treasury Holdings</span>
+            </label>
+          </div>
+          
+          <div class="holders-summary">
+            <div class="holder-stat">
+              <span class="holder-stat-label">CURRENT HOLDINGS</span>
+              <span class="holder-stat-value" id="gold-current">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">VALUE (USD)</span>
+              <span class="holder-stat-value" id="gold-usd">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">IN MUSK UNITS</span>
+              <span class="holder-stat-value holder-mu" id="gold-mu">--</span>
+            </div>
+            <div class="holder-stat">
+              <span class="holder-stat-label">CHANGE (25Y)</span>
+              <span class="holder-stat-value" id="gold-change">--</span>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="gold-chart"></canvas>
+          </div>
+          
+          <div class="holders-note">
+            <p>Source: World Gold Council | IMF IFS | Updated Quarterly</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Debt Tab -->
+      <section id="debt-tab" class="tab-content" style="display:none;">
+        <div class="hero">
+          <h1>US National Debt <span class="highlight">[TRACKER]</span></h1>
+          <p class="tagline">Real-time United States federal debt data</p>
+        </div>
+        
+        <div class="debt-container">
+          <div class="debt-display">
+            <div class="debt-label">TOTAL US DEBT</div>
+            <div class="debt-usd-value" id="debt-usd-main">$--T</div>
+            <div class="debt-musk-secondary">
+              <span id="debt-musks">--</span> <span class="mu-label">MUSK UNITS</span>
+            </div>
+          </div>
+          
+          <div class="debt-stats">
+            <div class="debt-stat">
+              <span class="debt-stat-label">DEBT/GDP</span>
+              <span class="debt-stat-value" id="debt-gdp-ratio">--%</span>
+            </div>
+            <div class="debt-stat">
+              <span class="debt-stat-label">ANNUAL INTEREST</span>
+              <span class="debt-stat-value" id="debt-interest">$--B</span>
+            </div>
+            <div class="debt-stat">
+              <span class="debt-stat-label">AS OF</span>
+              <span class="debt-stat-value" id="debt-date">--</span>
+            </div>
+            <div class="debt-stat">
+              <span class="debt-stat-label">1 MUSK UNIT</span>
+              <span class="debt-stat-value" id="debt-per-musk">$--B</span>
+            </div>
+          </div>
+          
+          <div class="debt-breakdown">
+            <div class="breakdown-title">DEBT BREAKDOWN</div>
+            <div class="breakdown-row">
+              <span class="breakdown-label">Debt Held by Public</span>
+              <span class="breakdown-value" id="debt-public">--</span>
+              <span class="breakdown-musks" id="debt-public-mu">-- MU</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="breakdown-label">Intragovernmental Holdings</span>
+              <span class="breakdown-value" id="debt-intragov">--</span>
+              <span class="breakdown-musks" id="debt-intragov-mu">-- MU</span>
+            </div>
+          </div>
+          
+          <div class="debt-chart-section">
+            <div class="breakdown-title">ANNUAL INTEREST PAYMENTS OVER TIME</div>
+            <div class="time-range interest-range">
+              <button class="range-btn interest-range-btn" data-range="10">10Y</button>
+              <button class="range-btn interest-range-btn" data-range="25">25Y</button>
+              <button class="range-btn interest-range-btn active" data-range="max">MAX</button>
+            </div>
+            <div class="chart-container">
+              <canvas id="interest-chart"></canvas>
+            </div>
+          </div>
+          
+          <div class="debt-chart-section">
+            <div class="breakdown-title">DEBT TO GDP RATIO OVER TIME</div>
+            <div class="time-range debt-range">
+              <button class="range-btn debt-range-btn" data-range="10">10Y</button>
+              <button class="range-btn debt-range-btn" data-range="25">25Y</button>
+              <button class="range-btn debt-range-btn active" data-range="max">MAX</button>
+            </div>
+            <div class="chart-container">
+              <canvas id="debt-chart"></canvas>
+            </div>
+          </div>
+          
+          <div class="debt-context">
+            <div class="context-title">PERSPECTIVE</div>
+            <div class="context-item" id="context-text">
+              Loading...
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calculator Tab -->
+      <section id="calculator-tab" class="tab-content" style="display:none;">
+        <div class="hero">
+          <h1>Musk Unit <span class="highlight">[CALCULATOR]</span></h1>
+          <p class="tagline">Convert any value to Musk Units (MU)</p>
+        </div>
+        
+        <div class="calc-container">
+          <div class="calc-input-row">
+            <input type="number" id="calc-amount" placeholder="Enter amount" value="1">
+            <select id="calc-unit">
+              <option value="1">Dollars</option>
+              <option value="1000">Thousand</option>
+              <option value="1000000">Million</option>
+              <option value="1000000000" selected>Billion</option>
+              <option value="1000000000000">Trillion</option>
+            </select>
+            <button id="calc-btn">CONVERT</button>
+          </div>
+          
+          <div class="calc-result">
+            <div class="result-label">MUSK UNITS</div>
+            <div class="result-value" id="calc-result">0.00117</div>
+            <div class="result-sub" id="calc-result-text">$1B = 0.00117 MU</div>
+          </div>
+          
+          <div class="calc-reference">
+            <div class="ref-title">QUICK REFERENCE</div>
+            <div class="ref-grid">
+              <div class="ref-item">
+                <span class="ref-value">$1M</span>
+                <span class="ref-mu" id="ref-1m">= 0.00000117 MU</span>
+              </div>
+              <div class="ref-item">
+                <span class="ref-value">$1B</span>
+                <span class="ref-mu" id="ref-1b">= 0.00117 MU</span>
+              </div>
+              <div class="ref-item">
+                <span class="ref-value">$100B</span>
+                <span class="ref-mu" id="ref-100b">= 0.117 MU</span>
+              </div>
+              <div class="ref-item">
+                <span class="ref-value">$1T</span>
+                <span class="ref-mu" id="ref-1t">= 1.17 MU</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Index Tab -->
+      <section id="index-tab" class="tab-content">
       <div class="hero">
         <h1>Global Asset Valuation <span class="highlight">[ELON INDEX]</span></h1>
         <p class="tagline">Real-time market capitalization data denominated in Musk Units (MU)</p>
@@ -70,6 +384,7 @@
           </tbody>
         </table>
       </div>
+      </section><!-- end index-tab -->
     </main>
 
     <footer>

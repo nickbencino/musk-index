@@ -238,9 +238,11 @@ async function fetchDebtData() {
     const debt = data.debt;
     const gdp = data.gdp;
     debtRatioData = data.ratioHistory;
+    interestData = data.interestHistory;
     
-    // Render the chart
+    // Render the charts
     updateDebtChart();
+    updateInterestChart();
     
     if (debt) {
       const totalDebt = parseFloat(debt.tot_pub_debt_out_amt);
@@ -254,8 +256,8 @@ async function fetchDebtData() {
       const intragovMU = intragovDebt / elonNetWorth;
       
       // Update display
+      document.getElementById('debt-usd-main').textContent = '$' + (totalDebt / 1e12).toFixed(2) + 'T';
       document.getElementById('debt-musks').textContent = totalMU.toFixed(1);
-      document.getElementById('debt-usd').textContent = '$' + (totalDebt / 1e12).toFixed(2) + 'T';
       document.getElementById('debt-date').textContent = recordDate;
       document.getElementById('debt-per-musk').textContent = '$' + (elonNetWorth / 1e9).toFixed(0) + 'B';
       
@@ -263,6 +265,16 @@ async function fetchDebtData() {
       if (gdp > 0) {
         const debtToGdp = (totalDebt / gdp) * 100;
         document.getElementById('debt-gdp-ratio').textContent = debtToGdp.toFixed(1) + '%';
+      }
+      
+      // Interest payments
+      const interestBillions = data.interestPayments || 0;
+      if (interestBillions > 0) {
+        if (interestBillions >= 1000) {
+          document.getElementById('debt-interest').textContent = '$' + (interestBillions / 1000).toFixed(2) + 'T/yr';
+        } else {
+          document.getElementById('debt-interest').textContent = '$' + interestBillions.toFixed(0) + 'B/yr';
+        }
       }
       
       document.getElementById('debt-public').textContent = '$' + (publicDebt / 1e12).toFixed(2) + 'T';
@@ -375,6 +387,93 @@ function updateDebtChart() {
   });
 }
 
+function updateInterestChart() {
+  if (!interestData || interestData.length === 0) return;
+  
+  // Filter by range
+  let filteredData = interestData;
+  if (interestRange !== 'max') {
+    const cutoffYear = new Date().getFullYear() - interestRange;
+    filteredData = interestData.filter(d => parseInt(d.date.split('-')[0]) >= cutoffYear);
+  }
+  
+  const labels = filteredData.map(d => d.date);
+  const values = filteredData.map(d => d.value);
+  
+  const ctx = document.getElementById('interest-chart').getContext('2d');
+  
+  if (interestChart) {
+    interestChart.destroy();
+  }
+  
+  interestChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        borderColor: '#ff6600',
+        backgroundColor: 'rgba(255, 102, 0, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.1,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#ff6600'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          titleColor: '#ff6600',
+          bodyColor: '#f5f5f5',
+          borderColor: '#ff6600',
+          borderWidth: 1,
+          callbacks: {
+            title: (items) => items[0]?.label || '',
+            label: (item) => `Interest: $${item.raw.toFixed(0)}B/year`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#2a2a2a', drawBorder: false },
+          ticks: { 
+            color: '#737373', 
+            font: { size: 10 },
+            maxRotation: 0,
+            callback: function(value, index) {
+              const label = this.getLabelForValue(value);
+              const month = label.split('-')[1];
+              return month === '01' ? label.split('-')[0] : '';
+            }
+          }
+        },
+        y: {
+          grid: { color: '#2a2a2a', drawBorder: false },
+          ticks: { 
+            color: '#737373',
+            callback: (val) => '$' + val + 'B'
+          },
+          title: {
+            display: true,
+            text: 'Annual Interest ($ Billions)',
+            color: '#737373'
+          }
+        }
+      }
+    }
+  });
+}
+
 // Holders data and chart
 let holdersData = null;
 let holdersChart = null;
@@ -384,6 +483,11 @@ let currentRange = 10;
 let debtRatioData = null;
 let debtChart = null;
 let debtRange = 'max';
+
+// Interest chart
+let interestData = null;
+let interestChart = null;
+let interestRange = 'max';
 
 // Gold data and chart
 let goldData = null;
@@ -490,10 +594,17 @@ function updateHoldersChart() {
   const labels = displayData.map(d => d.date);
   const values = displayData.map(d => d.value);
   
-  // Update stats
-  const current = countryData[countryData.length - 1]?.value || 0;
-  const peak = Math.max(...countryData.map(d => d.value));
+  // Update stats based on filtered range (not all-time)
+  const current = filteredData[filteredData.length - 1]?.value || 0;
+  const peak = Math.max(...filteredData.map(d => d.value));
+  const minVal = Math.min(...filteredData.map(d => d.value));
   const changeFromPeak = ((current - peak) / peak) * 100;
+  
+  // Calculate y-axis range with padding (show changes more dramatically)
+  const dataRange = peak - minVal;
+  const padding = dataRange * 0.1; // 10% padding
+  const yMin = Math.max(0, minVal - padding);
+  const yMax = peak + padding;
   
   document.getElementById('holder-current').textContent = '$' + current.toFixed(0) + 'B';
   document.getElementById('holder-mu').textContent = (current * 1e9 / elonNetWorth).toFixed(2) + ' MU';
@@ -564,10 +675,12 @@ function updateHoldersChart() {
           }
         },
         y: {
+          min: yMin,
+          max: yMax,
           grid: { color: '#2a2a2a', drawBorder: false },
           ticks: { 
             color: '#737373',
-            callback: (val) => '$' + val + 'B'
+            callback: (val) => '$' + Math.round(val) + 'B'
           },
           title: {
             display: true,
@@ -874,10 +987,15 @@ function updateGoldChart() {
 }
 
 // Tab switching
-function switchTab(tabName) {
+function switchTab(tabName, updateHash = true) {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
+  
+  // Update URL hash for shareable links
+  if (updateHash) {
+    history.pushState(null, '', '#' + tabName);
+  }
   
   document.getElementById('index-tab').style.display = tabName === 'index' ? 'block' : 'none';
   document.getElementById('holders-tab').style.display = tabName === 'holders' ? 'block' : 'none';
@@ -916,10 +1034,27 @@ function switchTab(tabName) {
   }
 }
 
+// Get tab from URL hash
+function getTabFromHash() {
+  const hash = window.location.hash.slice(1); // Remove #
+  const validTabs = ['index', 'debt', 'holders', 'gold', 'calculator'];
+  return validTabs.includes(hash) ? hash : 'index';
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
   fetchData();
   setInterval(fetchData, 5 * 60 * 1000);
+  
+  // Load tab from URL hash (or default to index)
+  const initialTab = getTabFromHash();
+  switchTab(initialTab, false);
+  
+  // Handle back/forward buttons
+  window.addEventListener('hashchange', () => {
+    const tab = getTabFromHash();
+    switchTab(tab, false);
+  });
   
   // Tab buttons
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1001,6 +1136,16 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
       debtRange = btn.dataset.range === 'max' ? 'max' : parseInt(btn.dataset.range);
       updateDebtChart();
+    });
+  });
+  
+  // Interest chart range
+  document.querySelectorAll('.interest-range-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.interest-range-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      interestRange = btn.dataset.range === 'max' ? 'max' : parseInt(btn.dataset.range);
+      updateInterestChart();
     });
   });
 });

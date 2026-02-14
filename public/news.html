@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MUSK UNITS | Real-Time Market News Terminal</title>
+  <meta name="description" content="Bloomberg-style financial news terminal measuring markets in Elons. Live gold, silver, copper, and equity news.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/terminal.css">
+  <style>
+    .back-link {
+      color: var(--orange);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      margin-left: 16px;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .back-link:hover {
+      opacity: 1;
+    }
+  </style>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+  <!-- Header -->
+  <div class="terminal-header">
+    <div class="terminal-brand">
+      <a href="index.html" class="terminal-logo" style="text-decoration:none;">MUSK UNITS</a>
+      <div class="terminal-tagline">Measuring Markets in Elons</div>
+      <a href="index.html" class="back-link">← Back to Index</a>
+    </div>
+    <div class="terminal-status">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span class="status-label">LIVE</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label" id="clock">--:--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="terminal-main">
+    <!-- Left Panel: Headlines -->
+    <div class="panel-left">
+      <div class="panel-header">
+        <span class="panel-title">News Feed</span>
+        <button class="panel-action" onclick="Actions.refreshAll()">↻ Refresh</button>
+      </div>
+      <div class="headlines-list" id="headlines-list">
+        <div class="loading-message">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Center Panel: Detail -->
+    <div class="panel-center">
+      <div class="detail-empty" id="detail-panel">
+        <div class="detail-empty-icon">📰</div>
+        <div>Select a headline to read more</div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Assets -->
+    <div class="panel-right">
+      <div class="asset-filter-header">
+        <span class="asset-filter-title">Filter by Asset</span>
+      </div>
+      <div class="asset-list" id="asset-list">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/news.js"></script>
+</body>
+</html>

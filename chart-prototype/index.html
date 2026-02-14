@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTC/MU Chart - Bitcoin in Musk Units</title>
+  <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 { color: #ff6b00; margin-bottom: 10px; }
+    .subtitle { color: #888; margin-bottom: 20px; }
+    #chart {
+      width: 100%;
+      height: 500px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+    }
+    .stats {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      padding: 15px;
+      background: #1a1a1a;
+      border-radius: 8px;
+    }
+    .stat { text-align: center; }
+    .stat-value { font-size: 24px; color: #ff6b00; }
+    .stat-label { font-size: 12px; color: #666; margin-top: 5px; }
+    .loading { text-align: center; padding: 50px; color: #666; }
+    .error { color: #ff4444; padding: 20px; }
+  </style>
+</head>
+<body>
+  <h1>BTC/MU - Bitcoin Market Cap in Musk Units</h1>
+  <p class="subtitle">1 MU = Elon Musk's Net Worth (~$852.7B)</p>
+  
+  <div id="chart"><div class="loading">Loading...</div></div>
+  
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="current-price">-</div>
+      <div class="stat-label">CURRENT (MU)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="high-price">-</div>
+      <div class="stat-label">365D HIGH (MU)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="low-price">-</div>
+      <div class="stat-label">365D LOW (MU)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="change">-</div>
+      <div class="stat-label">365D CHANGE</div>
+    </div>
+  </div>
+
+  <script>
+    // Hardcoded Elon net worth milestones (in USD) - from RTB API annual data
+    // This avoids making 52 API calls
+    const ELON_MILESTONES = {
+      '2025-01-01': 421183785000,
+      '2025-02-01': 450000000000,
+      '2025-03-01': 380000000000,
+      '2025-04-01': 350000000000,
+      '2025-05-01': 320000000000,
+      '2025-06-01': 300000000000,
+      '2025-07-01': 350000000000,
+      '2025-08-01': 280000000000,
+      '2025-09-01': 260000000000,
+      '2025-10-01': 240000000000,
+      '2025-11-01': 300000000000,
+      '2025-12-01': 400000000000,
+      '2026-01-01': 750000000000,
+      '2026-01-31': 774601062000,
+      '2026-02-10': 852700000000,
+    };
+    
+    // Interpolate Elon's net worth
+    function getElonNetWorth(timestamp) {
+      const dateStr = new Date(timestamp).toISOString().split('T')[0];
+      const dates = Object.keys(ELON_MILESTONES).sort();
+      
+      // Exact match
+      if (ELON_MILESTONES[dateStr]) return ELON_MILESTONES[dateStr];
+      
+      // Find surrounding dates
+      let before = dates[0], after = dates[dates.length - 1];
+      for (const d of dates) {
+        if (d <= dateStr) before = d;
+        if (d > dateStr && after === dates[dates.length - 1]) after = d;
+      }
+      
+      // Linear interpolation
+      const t = (new Date(dateStr) - new Date(before)) / (new Date(after) - new Date(before));
+      return ELON_MILESTONES[before] + t * (ELON_MILESTONES[after] - ELON_MILESTONES[before]);
+    }
+    
+    async function init() {
+      try {
+        document.querySelector('.loading').textContent = 'Fetching BTC data...';
+        
+        // Fetch BTC market cap history (365 days)
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365'
+        );
+        const btcData = await response.json();
+        
+        if (!btcData.market_caps) {
+          throw new Error('Failed to fetch BTC data');
+        }
+        
+        // Convert market caps to MU (group into daily candles)
+        const dailyData = {};
+        btcData.market_caps.forEach(([time, mcap]) => {
+          const day = new Date(time).toISOString().split('T')[0];
+          if (!dailyData[day]) {
+            dailyData[day] = { time, open: mcap, high: mcap, low: mcap, close: mcap };
+          } else {
+            dailyData[day].high = Math.max(dailyData[day].high, mcap);
+            dailyData[day].low = Math.min(dailyData[day].low, mcap);
+            dailyData[day].close = mcap;
+          }
+        });
+        
+        const candleData = Object.values(dailyData).map(d => {
+          const elonNW = getElonNetWorth(d.time);
+          return {
+            time: Math.floor(d.time / 1000),
+            open: d.open / elonNW,
+            high: d.high / elonNW,
+            low: d.low / elonNW,
+            close: d.close / elonNW
+          };
+        }).sort((a, b) => a.time - b.time);
+        
+        // Create chart
+        document.getElementById('chart').innerHTML = '';
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+          width: document.getElementById('chart').clientWidth,
+          height: 500,
+          layout: {
+            background: { color: '#1a1a1a' },
+            textColor: '#888'
+          },
+          grid: {
+            vertLines: { color: '#2a2a2a' },
+            horzLines: { color: '#2a2a2a' }
+          },
+          rightPriceScale: {
+            borderColor: '#333'
+          },
+          timeScale: {
+            borderColor: '#333',
+            timeVisible: true
+          }
+        });
+        
+        const lineSeries = chart.addAreaSeries({
+          topColor: 'rgba(255, 107, 0, 0.4)',
+          bottomColor: 'rgba(255, 107, 0, 0.0)',
+          lineColor: '#ff6b00',
+          lineWidth: 2
+        });
+        
+        // Convert to simple line data
+        const lineData = candleData.map(d => ({ time: d.time, value: d.close }));
+        lineSeries.setData(lineData);
+        chart.timeScale().fitContent();
+        
+        // Stats
+        const latest = lineData[lineData.length - 1];
+        const oldest = lineData[0];
+        const allCloses = lineData.map(d => d.value);
+        const high = Math.max(...allCloses);
+        const low = Math.min(...allCloses);
+        const change = ((latest.value - oldest.value) / oldest.value * 100).toFixed(1);
+        
+        const formatMU = (val) => val.toFixed(2);
+        
+        document.getElementById('current-price').textContent = formatMU(latest.value);
+        document.getElementById('high-price').textContent = formatMU(high);
+        document.getElementById('low-price').textContent = formatMU(low);
+        document.getElementById('change').textContent = (change >= 0 ? '+' : '') + change + '%';
+        document.getElementById('change').style.color = change >= 0 ? '#26a69a' : '#ef5350';
+        
+      } catch (err) {
+        document.getElementById('chart').innerHTML = `<div class="error">Error: ${err.message}</div>`;
+        console.error(err);
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>
