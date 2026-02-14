@@ -1,10 +1,26 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/**
+ * MuskUnits - Global Styles
+ * Bloomberg terminal-inspired design with mobile-first responsive layout.
+ * 
+ * Structure:
+ * 1. CSS Variables (Theme)
+ * 2. Reset & Base
+ * 3. Layout (Container, Header, Main, Footer)
+ * 4. Navigation & Tabs
+ * 5. Components (Buttons, Inputs, Cards)
+ * 6. Index Tab (Asset Table)
+ * 7. Data Tabs (Holders, Gold, Debt)
+ * 8. Calculator Tab
+ * 9. Utilities
+ * 10. Responsive Breakpoints
+ */
+
+/* =============================================================================
+   1. CSS VARIABLES (THEME)
+   ============================================================================= */
 
 :root {
+  /* Colors */
   --bg: #0d0d0d;
   --bg-panel: #1a1a1a;
   --bg-row: #0d0d0d;
@@ -17,29 +33,73 @@
   --green: #00ff41;
   --red: #ff3b3b;
   --blue: #4da6ff;
+  --purple: #a855f7;
   --border: #2a2a2a;
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Typography */
+  --font-mono: 'IBM Plex Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  
+  /* Borders */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+/* =============================================================================
+   2. RESET & BASE
+   ============================================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family: 'Bloomberg Terminal', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: var(--font-mono);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.4;
-  font-size: 18px;
+  font-size: var(--font-size-base);
+  overflow-x: hidden;
 }
+
+/* =============================================================================
+   3. LAYOUT
+   ============================================================================= */
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
-/* Header - Bloomberg style top bar */
+/* Header - stacks on mobile, row on desktop */
 header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   background: var(--bg-panel);
   border-bottom: 2px solid var(--orange);
 }
@@ -47,27 +107,80 @@ header {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
 }
 
 .logo-text {
-  font-size: 24px;
+  font-size: var(--font-size-lg);
   font-weight: bold;
   color: var(--orange);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
-/* Tabs */
+.elon-worth {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: #000;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  margin-left: auto;
+}
+
+.elon-worth .label {
+  color: var(--text-dim);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.elon-worth .value {
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  color: var(--amber);
+}
+
+/* Main content */
+main {
+  padding: var(--space-md);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: var(--space-md);
+  color: var(--text-dim);
+  font-size: var(--font-size-xs);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-md);
+}
+
+.disclaimer {
+  margin-top: var(--space-xs);
+  color: var(--orange);
+}
+
+/* =============================================================================
+   4. NAVIGATION & TABS
+   ============================================================================= */
+
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -75,13 +188,15 @@ header {
   border: 1px solid var(--border);
   border-bottom: none;
   color: var(--text-dim);
-  padding: 8px 20px;
-  font-size: 12px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
   font-family: inherit;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tab-btn:hover {
@@ -96,60 +211,34 @@ header {
   font-weight: bold;
 }
 
+.tab-link {
+  text-decoration: none;
+}
+
 .tab-content {
   display: block;
 }
 
-.elon-worth {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #000;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-}
+/* =============================================================================
+   5. COMPONENTS
+   ============================================================================= */
 
-.elon-worth .label {
-  color: var(--text-dim);
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-.elon-worth .value {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--amber);
-}
-
-/* Elon face icon */
-.elon-icon {
-  width: 16px;
-  height: 16px;
-  border-radius: 2px;
-  vertical-align: middle;
-  margin-left: 2px;
-}
-
-/* Main content */
-main {
-  padding: 16px;
-}
-
-/* Hero - minimal Bloomberg style */
+/* Hero Section */
 .hero {
   text-align: left;
-  padding: 16px 0;
+  padding: var(--space-md) 0;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
 }
 
 .hero h1 {
-  font-size: 32px;
+  font-size: var(--font-size-xl);
   font-weight: bold;
   color: var(--orange);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-xs);
+  word-wrap: break-word;
 }
 
 .hero .highlight {
@@ -158,84 +247,92 @@ main {
 
 .tagline {
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-style: italic;
 }
 
-/* Filters - Bloomberg button row */
-.filters {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
-  padding: 8px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-}
-
-.filter-btn {
+/* Buttons */
+.filter-btn,
+.range-btn {
   background: #000;
   border: 1px solid var(--border);
   color: var(--text-dim);
-  padding: 6px 14px;
-  font-size: 11px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
   font-family: inherit;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.1s;
+  touch-action: manipulation;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.range-btn:hover {
   border-color: var(--amber);
   color: var(--amber);
 }
 
-.filter-btn.active {
+.filter-btn.active,
+.range-btn.active {
   background: var(--orange);
   border-color: var(--orange);
   color: #000;
   font-weight: bold;
 }
 
-/* Stats row - Bloomberg data boxes */
-.stats-row {
+/* Filters */
+.filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
 }
 
 .stat {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 12px 20px;
-  min-width: 150px;
+  padding: var(--space-sm) var(--space-md);
 }
 
 .stat-value {
   display: block;
-  font-size: 28px;
+  font-size: var(--font-size-xl);
   font-weight: bold;
   color: var(--amber);
+  word-break: break-all;
 }
 
 .stat-label {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* Search - Bloomberg input */
+/* Search */
 .search-bar {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
 }
 
 #search {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   background: #000;
   border: 1px solid var(--border);
-  padding: 8px 12px;
-  font-size: 12px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
   font-family: inherit;
   color: var(--text);
   outline: none;
@@ -249,14 +346,126 @@ main {
   border-color: var(--orange);
 }
 
-/* Table - Bloomberg data grid */
+/* Selects */
+select {
+  background: #000;
+  border: 2px solid var(--border);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  color: var(--amber);
+  cursor: pointer;
+  font-weight: bold;
+  min-width: 0;
+  max-width: 100%;
+}
+
+select:focus {
+  border-color: var(--orange);
+  outline: none;
+}
+
+select optgroup {
+  color: var(--text-dim);
+  font-style: normal;
+}
+
+select option {
+  color: var(--amber);
+}
+
+/* Checkbox Toggle */
+.overlay-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-dim);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.overlay-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+
+.overlay-toggle:hover {
+  color: var(--orange);
+}
+
+/* Elon Icon */
+.elon-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* Chart Container */
+.chart-container {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  height: 300px;
+  min-height: 250px;
+}
+
+/* Explainer Boxes */
+.explainer-box {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.explainer-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-sm);
+}
+
+.explainer-content {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.explainer-content p {
+  margin-bottom: var(--space-sm);
+}
+
+.explainer-content p:last-child {
+  margin-bottom: 0;
+}
+
+.explainer-content strong {
+  color: var(--text);
+}
+
+/* =============================================================================
+   6. INDEX TAB (ASSET TABLE)
+   ============================================================================= */
+
 .table-wrap {
   background: var(--bg-panel);
   border: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
   width: 100%;
+  min-width: 500px;
   border-collapse: collapse;
 }
 
@@ -266,13 +475,14 @@ thead {
 
 th {
   text-align: left;
-  padding: 10px 12px;
-  font-size: 10px;
+  padding: var(--space-sm);
+  font-size: var(--font-size-xs);
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--orange);
   border-bottom: 2px solid var(--orange);
+  white-space: nowrap;
 }
 
 th.sortable {
@@ -283,14 +493,14 @@ th.sortable:hover {
   color: var(--amber);
 }
 
-.col-rank { width: 50px; text-align: center; }
+.col-rank { width: 40px; text-align: center; }
 .col-elons { text-align: right; }
 .col-mcap { text-align: right; }
 .col-price { text-align: right; }
-.col-change { text-align: right; width: 90px; }
+.col-change { text-align: right; width: 80px; }
 
 td {
-  padding: 12px 16px;
+  padding: var(--space-sm);
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
@@ -305,27 +515,28 @@ tr:hover td {
 
 .loading {
   text-align: center;
-  padding: 40px;
+  padding: var(--space-xl);
   color: var(--text-dim);
 }
 
-/* Asset cell */
+/* Asset Cell */
 .asset-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .asset-logo {
   width: 24px;
   height: 24px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .asset-logo img {
@@ -335,11 +546,11 @@ tr:hover td {
 }
 
 .asset-logo .emoji {
-  font-size: 14px;
+  font-size: var(--font-size-base);
 }
 
 .asset-logo .letter {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: bold;
   color: var(--text-dim);
 }
@@ -347,29 +558,30 @@ tr:hover td {
 .asset-info .name {
   font-weight: bold;
   color: var(--text);
+  font-size: var(--font-size-sm);
 }
 
 .asset-info .symbol {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--blue);
 }
 
 .type-tag {
   display: inline-block;
   padding: 1px 4px;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: bold;
   text-transform: uppercase;
-  margin-left: 6px;
+  margin-left: var(--space-xs);
   border: 1px solid;
 }
 
 .type-tag.stock { border-color: var(--blue); color: var(--blue); }
-.type-tag.crypto { border-color: #a855f7; color: #a855f7; }
+.type-tag.crypto { border-color: var(--purple); color: var(--purple); }
 .type-tag.metal { border-color: var(--amber); color: var(--amber); }
 .type-tag.etf { border-color: var(--green); color: var(--green); }
 
-/* Values */
+/* Table Values */
 .rank {
   font-weight: bold;
   color: var(--text-dim);
@@ -380,93 +592,58 @@ tr:hover td {
   text-align: right;
   font-weight: bold;
   color: var(--amber);
+  white-space: nowrap;
 }
 
-.mcap-value, .price-value {
+.mcap-value,
+.price-value {
   text-align: right;
   color: var(--text);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .change-value {
   text-align: right;
   font-weight: bold;
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .change-value.positive { color: var(--green); }
 .change-value.negative { color: var(--red); }
 
-/* Footer */
-footer {
-  text-align: center;
-  padding: 16px;
-  color: var(--text-dim);
-  font-size: 11px;
-  border-top: 1px solid var(--border);
-  margin-top: 16px;
-}
+/* =============================================================================
+   7. DATA TABS (HOLDERS, GOLD, DEBT)
+   ============================================================================= */
 
-.disclaimer {
-  margin-top: 4px;
-  color: var(--orange);
-}
-
-/* Holders Page */
-.holders-container {
+/* Shared Container */
+.holders-container,
+.debt-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px 0;
+  padding: var(--space-md) 0;
 }
 
+/* Controls Row */
 .holders-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
-.overlay-toggle {
+.time-range {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-dim);
-  font-size: 13px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.overlay-toggle input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--orange);
-  cursor: pointer;
-}
-
-.overlay-toggle:hover {
-  color: var(--orange);
-}
-
-#country-select,
-#gold-country-select {
-  background: #000;
-  border: 2px solid var(--border);
-  padding: 12px 20px;
-  font-size: 16px;
-  font-family: inherit;
-  color: var(--amber);
-  cursor: pointer;
-  min-width: 200px;
-  font-weight: bold;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
 }
 
 .display-mode-select {
   background: #000;
   border: 2px solid var(--border);
-  padding: 12px 20px;
-  font-size: 14px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
   font-family: inherit;
   color: var(--text);
   cursor: pointer;
@@ -482,79 +659,36 @@ footer {
   border-color: var(--amber);
 }
 
-#country-select:focus,
-#gold-country-select:focus {
-  border-color: var(--orange);
-  outline: none;
-}
-
-#gold-country-select optgroup {
-  color: var(--text-dim);
-  font-style: normal;
-}
-
-#gold-country-select option {
-  color: var(--amber);
-}
-
-.time-range {
-  display: flex;
-  gap: 4px;
-}
-
-.range-btn {
-  background: #000;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  padding: 10px 18px;
-  font-size: 12px;
-  font-family: inherit;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.1s;
-}
-
-.range-btn:hover {
-  border-color: var(--amber);
-  color: var(--amber);
-}
-
-.range-btn.active {
-  background: var(--orange);
-  border-color: var(--orange);
-  color: #000;
-  font-weight: bold;
-}
-
+/* Summary Stats Grid */
 .holders-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
 }
 
 .holder-stat {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 16px;
+  padding: var(--space-md);
   text-align: center;
 }
 
 .holder-stat-label {
   display: block;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .holder-stat-value {
   display: block;
-  font-size: 20px;
+  font-size: var(--font-size-lg);
   font-weight: bold;
   color: var(--text);
+  word-break: break-all;
 }
 
 .holder-stat-value.holder-mu {
@@ -569,33 +703,19 @@ footer {
   color: var(--green);
 }
 
-.chart-container {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  padding: 20px;
-  margin-bottom: 16px;
-  height: 400px;
-}
-
 .holders-note {
   text-align: center;
   color: var(--text-dim);
-  font-size: 11px;
+  font-size: var(--font-size-xs);
 }
 
-/* Debt Page */
-.debt-container {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 20px 0;
-}
-
+/* Debt Display */
 .debt-display {
   background: var(--bg-panel);
   border: 3px solid var(--orange);
-  padding: 60px 40px;
+  padding: var(--space-xl) var(--space-md);
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
   position: relative;
   overflow: hidden;
 }
@@ -606,8 +726,8 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 350px;
-  height: 350px;
+  width: 250px;
+  height: 250px;
   background: url('../img/elon.png') center center no-repeat;
   background-size: contain;
   opacity: 0.25;
@@ -620,27 +740,15 @@ footer {
 }
 
 .debt-label {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 3px;
-  margin-bottom: 16px;
-}
-
-.debt-musk-value {
-  font-size: 72px;
-  font-weight: bold;
-  color: var(--red);
-  text-shadow: 
-    -2px -2px 0 #000,
-    2px -2px 0 #000,
-    -2px 2px 0 #000,
-    2px 2px 0 #000,
-    0 0 30px rgba(255,59,59,0.5);
+  margin-bottom: var(--space-md);
 }
 
 .debt-usd-value {
-  font-size: 80px;
+  font-size: var(--font-size-3xl);
   font-weight: bold;
   color: var(--text);
   text-shadow: 
@@ -648,11 +756,12 @@ footer {
     2px -2px 0 #000,
     -2px 2px 0 #000,
     2px 2px 0 #000;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
+  word-break: break-all;
 }
 
 .debt-musk-secondary {
-  font-size: 28px;
+  font-size: var(--font-size-xl);
   color: var(--red);
   font-weight: bold;
   text-shadow: 
@@ -663,76 +772,68 @@ footer {
 }
 
 .debt-musk-secondary .mu-label {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--amber);
   letter-spacing: 2px;
   vertical-align: middle;
 }
 
-.debt-musk-label {
-  font-size: 18px;
-  color: var(--amber);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-top: 8px;
-  text-shadow: 
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
-}
-
+/* Debt Stats Grid */
 .debt-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .debt-stat {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 16px;
+  padding: var(--space-md);
   text-align: center;
 }
 
 .debt-stat-label {
   display: block;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .debt-stat-value {
   display: block;
-  font-size: 20px;
+  font-size: var(--font-size-lg);
   font-weight: bold;
   color: var(--amber);
+  word-break: break-all;
 }
 
+/* Breakdown Section */
 .debt-breakdown {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 20px;
-  margin-bottom: 24px;
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .breakdown-title {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--orange);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
   font-weight: bold;
 }
 
 .breakdown-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -742,74 +843,83 @@ footer {
 
 .breakdown-label {
   color: var(--text);
+  flex: 1;
+  min-width: 150px;
 }
 
 .breakdown-value {
   color: var(--text-dim);
-  font-family: 'Consolas', monospace;
+  font-family: var(--font-mono);
 }
 
 .breakdown-musks {
   color: var(--amber);
   font-weight: bold;
-  min-width: 100px;
+  min-width: 80px;
   text-align: right;
 }
 
+/* Chart Section */
 .debt-chart-section {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 20px;
-  margin-bottom: 24px;
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .debt-chart-section .breakdown-title {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 .debt-chart-section .time-range {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
 }
 
+/* Context */
 .debt-context {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 20px;
+  padding: var(--space-md);
 }
 
 .context-title {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--orange);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
   font-weight: bold;
 }
 
 .context-item {
   color: var(--text-dim);
   line-height: 1.6;
+  font-size: var(--font-size-sm);
 }
 
-/* Calculator */
+/* =============================================================================
+   8. CALCULATOR TAB
+   ============================================================================= */
+
 .calc-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px 0;
+  padding: var(--space-md) 0;
 }
 
 .calc-input-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 #calc-amount {
-  flex: 1;
+  width: 100%;
   background: #000;
   border: 2px solid var(--border);
-  padding: 16px 20px;
-  font-size: 24px;
+  padding: var(--space-md);
+  font-size: var(--font-size-xl);
   font-family: inherit;
   color: var(--text);
   outline: none;
@@ -825,14 +935,14 @@ footer {
 }
 
 #calc-unit {
+  width: 100%;
   background: #000;
   border: 2px solid var(--border);
-  padding: 16px 20px;
-  font-size: 14px;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
   font-family: inherit;
   color: var(--text);
   cursor: pointer;
-  min-width: 140px;
 }
 
 #calc-unit:focus {
@@ -841,28 +951,32 @@ footer {
 }
 
 #calc-btn {
+  width: 100%;
   background: var(--orange);
   border: none;
-  padding: 16px 28px;
-  font-size: 14px;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
   font-family: inherit;
   font-weight: bold;
   color: #000;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
+  touch-action: manipulation;
 }
 
-#calc-btn:hover {
+#calc-btn:hover,
+#calc-btn:active {
   background: var(--amber);
 }
 
+/* Calculator Result */
 .calc-result {
   background: var(--bg-panel);
   border: 2px solid var(--orange);
-  padding: 60px 32px;
+  padding: var(--space-xl) var(--space-md);
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
   position: relative;
   overflow: hidden;
 }
@@ -873,8 +987,8 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 280px;
-  height: 280px;
+  width: 200px;
+  height: 200px;
   background: url('../img/elon.png') center center no-repeat;
   background-size: contain;
   opacity: 0.15;
@@ -887,50 +1001,52 @@ footer {
 }
 
 .result-label {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .result-value {
-  font-size: 48px;
+  font-size: var(--font-size-3xl);
   font-weight: bold;
   color: var(--amber);
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
+  word-break: break-all;
 }
 
 .result-sub {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--text-dim);
 }
 
+/* Reference Grid */
 .calc-reference {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  padding: 20px;
+  padding: var(--space-md);
 }
 
 .ref-title {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--orange);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
   font-weight: bold;
 }
 
 .ref-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
 }
 
 .ref-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: var(--space-sm);
   background: #000;
   border: 1px solid var(--border);
 }
@@ -944,82 +1060,170 @@ footer {
   color: var(--amber);
 }
 
-/* Explainer Boxes */
-.explainer-box {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--orange);
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin: 0 24px 24px 24px;
-}
+/* =============================================================================
+   9. UTILITIES
+   ============================================================================= */
 
-.explainer-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--orange);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
+.positive { color: var(--green); }
+.negative { color: var(--red); }
 
-.explainer-content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-dim);
-}
+/* =============================================================================
+   10. RESPONSIVE BREAKPOINTS
+   ============================================================================= */
 
-.explainer-content p {
-  margin-bottom: 10px;
-}
-
-.explainer-content p:last-child {
-  margin-bottom: 0;
-}
-
-.explainer-content strong {
-  color: var(--text);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .explainer-box {
-    margin: 0 12px 16px 12px;
-    padding: 16px;
+/* Tablet and up (600px+) */
+@media (min-width: 600px) {
+  /* Header becomes row */
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-lg);
   }
   
-  .explainer-content {
-    font-size: 13px;
+  .logo-text {
+    font-size: var(--font-size-2xl);
   }
   
-  .stats-row {
+  /* Larger hero */
+  .hero h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  /* Larger stat values */
+  .stat-value {
+    font-size: var(--font-size-2xl);
+  }
+  
+  /* 4-column summary grids */
+  .holders-summary,
+  .debt-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Holder stat bigger text */
+  .holder-stat-value,
+  .debt-stat-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  /* Controls in row */
+  .holders-controls {
+    flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
   }
   
-  .stat {
-    min-width: 100px;
+  /* Calculator inputs in row */
+  .calc-input-row {
+    flex-direction: row;
   }
   
-  .col-mcap, .col-price {
+  #calc-amount {
+    flex: 1;
+  }
+  
+  #calc-unit {
+    width: auto;
+    min-width: 140px;
+  }
+  
+  #calc-btn {
+    width: auto;
+    padding: var(--space-md) var(--space-xl);
+  }
+  
+  /* Reference grid 2 columns */
+  .ref-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Larger chart */
+  .chart-container {
+    height: 400px;
+  }
+  
+  /* Larger debt display */
+  .debt-usd-value {
+    font-size: 64px;
+  }
+  
+  .debt-musk-secondary {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .debt-display::before {
+    width: 350px;
+    height: 350px;
+  }
+  
+  /* Larger result value */
+  .result-value {
+    font-size: 48px;
+  }
+  
+  .calc-result::before {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .calc-result {
+    padding: 60px var(--space-xl);
+  }
+}
+
+/* Desktop (900px+) */
+@media (min-width: 900px) {
+  /* Larger hero */
+  .hero h1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  /* Tab buttons larger */
+  .tab-btn {
+    padding: var(--space-sm) var(--space-lg);
+  }
+  
+  /* Debt display bigger */
+  .debt-usd-value {
+    font-size: 80px;
+  }
+  
+  .debt-display {
+    padding: 60px var(--space-xl);
+  }
+}
+
+/* Large desktop (1200px+) */
+@media (min-width: 1200px) {
+  main {
+    padding: var(--space-lg);
+  }
+  
+  .explainer-box {
+    padding: var(--space-lg);
+  }
+}
+
+/* Hide less important columns on small screens */
+@media (max-width: 599px) {
+  .col-mcap,
+  .col-price {
     display: none;
   }
   
-  #search {
-    width: 100%;
+  /* Smaller table text */
+  td {
+    font-size: var(--font-size-sm);
   }
   
-  .calc-input-row {
-    flex-direction: column;
+  .asset-info .name {
+    font-size: var(--font-size-xs);
   }
   
-  #calc-amount, #calc-unit, #calc-btn {
-    width: 100%;
-  }
-  
-  .ref-grid {
-    grid-template-columns: 1fr;
+  /* Hide type tag on very small screens */
+  .type-tag {
+    display: none;
   }
 }
-
-/* News tab link */
-.tab-link { text-decoration: none; }
