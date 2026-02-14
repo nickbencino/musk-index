@@ -170,6 +170,47 @@ footer {
    4. NAVIGATION & TABS
    ============================================================================= */
 
+/* Hamburger Menu Button */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  padding: 6px;
+  order: 2;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--orange);
+  transition: all 0.2s;
+}
+
+.hamburger:hover {
+  border-color: var(--orange);
+}
+
+/* Hamburger active state (X shape) */
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(4px, 4px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* Mobile Nav - hidden by default */
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -1206,8 +1247,62 @@ tr:hover td {
   }
 }
 
-/* Hide less important columns on small screens */
+/* =============================================================================
+   MOBILE NAVIGATION (max-width: 599px)
+   ============================================================================= */
 @media (max-width: 599px) {
+  /* Header layout for mobile */
+  header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    order: 1;
+  }
+  
+  .hamburger {
+    order: 2;
+  }
+  
+  .elon-worth {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+    margin-top: var(--space-sm);
+  }
+  
+  /* Tabs - collapsed dropdown on mobile */
+  .tabs {
+    display: none;
+    order: 4;
+    width: 100%;
+    flex-direction: column;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    margin-top: var(--space-sm);
+  }
+  
+  .tabs.open {
+    display: flex;
+  }
+  
+  .tab-btn {
+    width: 100%;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-md);
+  }
+  
+  .tab-btn:last-child {
+    border-bottom: none;
+  }
+  
+  /* Hide table columns */
   .col-mcap,
   .col-price {
     display: none;
@@ -1224,6 +1319,13 @@ tr:hover td {
   
   /* Hide type tag on very small screens */
   .type-tag {
+    display: none;
+  }
+}
+
+/* Hide hamburger on tablet and up */
+@media (min-width: 600px) {
+  .hamburger {
     display: none;
   }
 }

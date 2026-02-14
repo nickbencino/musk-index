@@ -41,12 +41,36 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize all event listeners
   initTabListeners();
+  initHamburgerMenu();
   initIndexListeners();
   initCalculatorListeners();
   initDebtListeners();
   initHoldersListeners();
   initGoldListeners();
 });
+
+/**
+ * Initialize hamburger menu toggle for mobile
+ */
+function initHamburgerMenu() {
+  const hamburger = document.getElementById('hamburger');
+  const tabs = document.getElementById('nav-tabs');
+  
+  if (!hamburger || !tabs) return;
+  
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    tabs.classList.toggle('open');
+  });
+  
+  // Close menu when a tab is clicked
+  tabs.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      tabs.classList.remove('open');
+    });
+  });
+}
 
 /**
  * Initialize tab navigation event listeners
