@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabListeners();
   initHamburgerMenu();
   initIndexListeners();
-  initCalculatorListeners();
   initDebtListeners();
   initHoldersListeners();
   initGoldListeners();

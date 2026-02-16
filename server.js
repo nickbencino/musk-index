@@ -267,6 +267,141 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', elonNetWorth, cached: !!cachedData });
 });
 
+// =============================================================================
+// DEBT API
+// =============================================================================
+
+const US_POPULATION = 335000000;
+const US_HOUSEHOLDS = 131000000;
+
+app.get('/api/debt', async (req, res) => {
+  try {
+    // Fetch all data in parallel
+    const [
+      debtResponse, 
+      gdpResponse, 
+      ratioResponse, 
+      interestResponse,
+      debtHistoryResponse
+    ] = await Promise.all([
+      fetch('https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny?sort=-record_date&page[size]=1'),
+      fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDP'),
+      fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=GFDEGDQ188S'),
+      fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=A091RC1Q027SBEA'),
+      fetch('https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny?sort=-record_date&page[size]=400&fields=record_date,tot_pub_debt_out_amt')
+    ]);
+    
+    const debtData = await debtResponse.json();
+    const gdpCsv = await gdpResponse.text();
+    const ratioCsv = await ratioResponse.text();
+    const interestCsv = await interestResponse.text();
+    const debtHistoryData = await debtHistoryResponse.json();
+    
+    // Current debt values
+    const currentDebt = debtData.data?.[0];
+    const totalDebt = currentDebt ? parseFloat(currentDebt.tot_pub_debt_out_amt) : 0;
+    const publicDebt = currentDebt ? parseFloat(currentDebt.debt_held_public_amt) : 0;
+    const intragovDebt = currentDebt ? parseFloat(currentDebt.intragov_hold_amt) : 0;
+    
+    // Parse GDP from FRED CSV
+    const gdpLines = gdpCsv.trim().split('\n');
+    const lastGdpLine = gdpLines[gdpLines.length - 1];
+    const gdpBillions = parseFloat(lastGdpLine.split(',')[1]);
+    const gdp = gdpBillions * 1e9;
+    
+    // Parse debt/GDP ratio history
+    const ratioLines = ratioCsv.trim().split('\n').slice(1);
+    const debtRatioData = ratioLines.map(line => {
+      const [date, value] = line.split(',');
+      return { date: date.substring(0, 7), value: parseFloat(value) };
+    }).filter(d => !isNaN(d.value));
+    const currentRatio = debtRatioData[debtRatioData.length - 1]?.value || 0;
+    
+    // Parse interest payments
+    const interestLines = interestCsv.trim().split('\n').slice(1);
+    const interestData = interestLines.map(line => {
+      const [date, value] = line.split(',');
+      return { date: date.substring(0, 7), value: parseFloat(value) };
+    }).filter(d => !isNaN(d.value));
+    const latestInterest = interestData[interestData.length - 1];
+    const annualInterestBillions = latestInterest?.value || 0;
+    
+    // Calculate annual debt increase
+    let annualIncrease = 0;
+    let annualIncreasePercent = 0;
+    if (debtHistoryData.data && debtHistoryData.data.length > 0) {
+      const currentDate = new Date(debtHistoryData.data[0].record_date);
+      const oneYearAgo = new Date(currentDate);
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      
+      const yearAgoRecord = debtHistoryData.data.find(d => {
+        const recordDate = new Date(d.record_date);
+        return recordDate <= oneYearAgo;
+      });
+      
+      if (yearAgoRecord) {
+        const yearAgoDebt = parseFloat(yearAgoRecord.tot_pub_debt_out_amt);
+        annualIncrease = totalDebt - yearAgoDebt;
+        annualIncreasePercent = ((totalDebt - yearAgoDebt) / yearAgoDebt) * 100;
+      }
+    }
+    
+    // Calculated values
+    const perPersonDebt = totalDebt / US_POPULATION;
+    const perHouseholdDebt = totalDebt / US_HOUSEHOLDS;
+    const publicPercent = (publicDebt / totalDebt) * 100;
+    const intragovPercent = (intragovDebt / totalDebt) * 100;
+    const foreignHoldingsEstimate = publicDebt * 0.24;
+    const foreignPercent = (foreignHoldingsEstimate / totalDebt) * 100;
+    const privatePercent = publicPercent - foreignPercent;
+    const gdpGrowthPercent = 2.5;
+    const debtGrowingFasterThanEconomy = annualIncreasePercent > gdpGrowthPercent;
+    const projectedRatio = currentRatio * Math.pow(1 + (annualIncreasePercent - gdpGrowthPercent) / 100, 10);
+    
+    res.json({
+      success: true,
+      debt: currentDebt,
+      gdp: gdp,
+      gdpBillions: gdpBillions,
+      ratioHistory: debtRatioData,
+      interestPayments: annualInterestBillions,
+      interestHistory: interestData,
+      stats: {
+        totalDebt,
+        debtToGdpRatio: currentRatio,
+        perPersonDebt,
+        perHouseholdDebt,
+        annualInterest: annualInterestBillions,
+        annualIncrease,
+        annualIncreasePercent
+      },
+      composition: {
+        publicDebt,
+        publicPercent,
+        intragovDebt,
+        intragovPercent,
+        foreignEstimate: foreignHoldingsEstimate,
+        foreignPercent,
+        privatePercent
+      },
+      growth: {
+        annualIncrease,
+        annualIncreasePercent,
+        debtGrowingFasterThanEconomy,
+        projectedRatio10Y: projectedRatio
+      },
+      constants: {
+        population: US_POPULATION,
+        households: US_HOUSEHOLDS
+      },
+      lastUpdated: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching debt data:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Elon Units running at http://localhost:${PORT}`);
   console.log(`Also at http://192.168.1.216:${PORT}`);

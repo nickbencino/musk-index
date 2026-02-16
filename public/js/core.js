@@ -112,7 +112,7 @@ function formatMU(mu) {
 /**
  * Valid tab names for URL routing
  */
-const VALID_TABS = ['index', 'debt', 'holders', 'gold', 'calculator'];
+const VALID_TABS = ['index', 'debt', 'holders', 'gold'];
 
 /**
  * Switch to a specific tab
@@ -135,12 +135,8 @@ function switchTab(tabName, updateHash = true) {
   document.getElementById('holders-tab').style.display = tabName === 'holders' ? 'block' : 'none';
   document.getElementById('gold-tab').style.display = tabName === 'gold' ? 'block' : 'none';
   document.getElementById('debt-tab').style.display = tabName === 'debt' ? 'block' : 'none';
-  document.getElementById('calculator-tab').style.display = tabName === 'calculator' ? 'block' : 'none';
   
   // Trigger tab-specific initialization
-  if (tabName === 'calculator' && typeof initCalculatorTab === 'function') {
-    initCalculatorTab();
-  }
   if (tabName === 'debt' && typeof initDebtTab === 'function') {
     initDebtTab();
   }

@@ -1,180 +1,116 @@
 /**
  * MuskUnits US Debt Tab Module
- * Displays US national debt data with charts and MU conversion.
+ * Bloomberg-style dashboard with fun comparisons.
  * 
  * @module debt
  * @requires core.js
  */
 
 // =============================================================================
-// DEBT TAB STATE
+// STATE
 // =============================================================================
 
 let debtRange = 'max';
 let interestRange = 'max';
 
 // =============================================================================
-// CHART RENDERING
+// CHARTS
 // =============================================================================
 
-/**
- * Update the Debt-to-GDP ratio chart
- */
 function updateDebtChart() {
   if (!MU.debtRatioData || MU.debtRatioData.length === 0) return;
   
-  // Filter by selected range
   let filteredData = MU.debtRatioData;
   if (debtRange !== 'max') {
     const cutoffYear = new Date().getFullYear() - debtRange;
     filteredData = MU.debtRatioData.filter(d => parseInt(d.date.split('-')[0]) >= cutoffYear);
   }
   
-  const labels = filteredData.map(d => d.date);
-  const values = filteredData.map(d => d.value);
-  
   const ctx = document.getElementById('debt-chart').getContext('2d');
-  
-  // Destroy existing chart if present
-  if (MU.charts.debt) {
-    MU.charts.debt.destroy();
-  }
+  if (MU.charts.debt) MU.charts.debt.destroy();
   
   MU.charts.debt = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels: filteredData.map(d => d.date),
       datasets: [{
-        data: values,
+        data: filteredData.map(d => d.value),
         borderColor: CHART_DEFAULTS.colors.red,
         backgroundColor: 'rgba(255, 59, 59, 0.1)',
         borderWidth: 2,
         fill: true,
         tension: 0.1,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: CHART_DEFAULTS.colors.red
+        pointRadius: 0
       }]
     },
     options: {
       ...CHART_DEFAULTS.getBaseOptions(CHART_DEFAULTS.colors.red),
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          ...CHART_DEFAULTS.getBaseOptions(CHART_DEFAULTS.colors.red).plugins.tooltip,
-          callbacks: {
-            title: (items) => items[0]?.label || '',
-            label: (item) => `Debt/GDP: ${item.raw.toFixed(1)}%`
-          }
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
         x: {
-          grid: { color: CHART_DEFAULTS.colors.grid, drawBorder: false },
+          grid: { color: CHART_DEFAULTS.colors.grid },
           ticks: { 
-            color: CHART_DEFAULTS.colors.text, 
-            font: { size: 10 },
+            color: CHART_DEFAULTS.colors.text,
             maxRotation: 0,
             callback: function(value) {
               const label = this.getLabelForValue(value);
-              const month = label.split('-')[1];
-              return month === '01' ? label.split('-')[0] : '';
+              return label.split('-')[1] === '01' ? label.split('-')[0] : '';
             }
           }
         },
         y: {
-          grid: { color: CHART_DEFAULTS.colors.grid, drawBorder: false },
-          ticks: { 
-            color: CHART_DEFAULTS.colors.text,
-            callback: (val) => val + '%'
-          },
-          title: {
-            display: true,
-            text: 'Debt / GDP (%)',
-            color: CHART_DEFAULTS.colors.text
-          }
+          grid: { color: CHART_DEFAULTS.colors.grid },
+          ticks: { color: CHART_DEFAULTS.colors.text, callback: v => v + '%' }
         }
       }
     }
   });
 }
 
-/**
- * Update the annual interest payments chart
- */
 function updateInterestChart() {
   if (!MU.interestData || MU.interestData.length === 0) return;
   
-  // Filter by selected range
   let filteredData = MU.interestData;
   if (interestRange !== 'max') {
     const cutoffYear = new Date().getFullYear() - interestRange;
     filteredData = MU.interestData.filter(d => parseInt(d.date.split('-')[0]) >= cutoffYear);
   }
   
-  const labels = filteredData.map(d => d.date);
-  const values = filteredData.map(d => d.value);
-  
   const ctx = document.getElementById('interest-chart').getContext('2d');
-  
-  // Destroy existing chart if present
-  if (MU.charts.interest) {
-    MU.charts.interest.destroy();
-  }
+  if (MU.charts.interest) MU.charts.interest.destroy();
   
   MU.charts.interest = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels: filteredData.map(d => d.date),
       datasets: [{
-        data: values,
+        data: filteredData.map(d => d.value),
         borderColor: CHART_DEFAULTS.colors.orange,
         backgroundColor: 'rgba(255, 102, 0, 0.1)',
         borderWidth: 2,
         fill: true,
         tension: 0.1,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: CHART_DEFAULTS.colors.orange
+        pointRadius: 0
       }]
     },
     options: {
       ...CHART_DEFAULTS.getBaseOptions(CHART_DEFAULTS.colors.orange),
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          ...CHART_DEFAULTS.getBaseOptions(CHART_DEFAULTS.colors.orange).plugins.tooltip,
-          callbacks: {
-            title: (items) => items[0]?.label || '',
-            label: (item) => `Interest: $${item.raw.toFixed(0)}B/year`
-          }
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
         x: {
-          grid: { color: CHART_DEFAULTS.colors.grid, drawBorder: false },
+          grid: { color: CHART_DEFAULTS.colors.grid },
           ticks: { 
-            color: CHART_DEFAULTS.colors.text, 
-            font: { size: 10 },
+            color: CHART_DEFAULTS.colors.text,
             maxRotation: 0,
             callback: function(value) {
               const label = this.getLabelForValue(value);
-              const month = label.split('-')[1];
-              return month === '01' ? label.split('-')[0] : '';
+              return label.split('-')[1] === '01' ? label.split('-')[0] : '';
             }
           }
         },
         y: {
-          grid: { color: CHART_DEFAULTS.colors.grid, drawBorder: false },
-          ticks: { 
-            color: CHART_DEFAULTS.colors.text,
-            callback: (val) => '$' + val + 'B'
-          },
-          title: {
-            display: true,
-            text: 'Annual Interest ($ Billions)',
-            color: CHART_DEFAULTS.colors.text
-          }
+          grid: { color: CHART_DEFAULTS.colors.grid },
+          ticks: { color: CHART_DEFAULTS.colors.text, callback: v => '$' + v }
         }
       }
     }
@@ -182,104 +118,134 @@ function updateInterestChart() {
 }
 
 // =============================================================================
-// DATA FETCHING
+// FORMATTING
 // =============================================================================
 
-/**
- * Fetch debt data from API and update display
- */
+function fmt(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function fmtT(num) {
+  return '$' + (num / 1e12).toFixed(2) + 'T';
+}
+
+function fmtB(num) {
+  return num >= 1000 ? '$' + (num / 1000).toFixed(2) + 'T' : '$' + num.toFixed(0) + 'B';
+}
+
+function fmtD(num) {
+  return '$' + fmt(Math.round(num));
+}
+
+// =============================================================================
+// DATA
+// =============================================================================
+
 async function fetchDebtData() {
   try {
     const response = await fetch('/api/debt');
     const data = await response.json();
     
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch debt data');
-    }
+    if (!data.success) throw new Error(data.error);
     
-    const debt = data.debt;
-    const gdp = data.gdp;
     MU.debtRatioData = data.ratioHistory;
     MU.interestData = data.interestHistory;
     
-    // Render charts
     updateDebtChart();
     updateInterestChart();
     
-    if (debt) {
-      updateDebtDisplay(debt, gdp, data.interestPayments);
-    }
+    if (data.debt) updateDebtDisplay(data);
   } catch (err) {
     console.error('Error fetching debt:', err);
   }
 }
 
-/**
- * Update the debt display with fetched data
- * @param {object} debt - Debt data object from Treasury API
- * @param {number} gdp - Current GDP value
- * @param {number} interestPayments - Annual interest payments in billions
- */
-function updateDebtDisplay(debt, gdp, interestPayments) {
-  const totalDebt = parseFloat(debt.tot_pub_debt_out_amt);
-  const publicDebt = parseFloat(debt.debt_held_public_amt);
-  const intragovDebt = parseFloat(debt.intragov_hold_amt);
-  const recordDate = debt.record_date;
-  
-  // Calculate Musk Units
+function updateDebtDisplay(data) {
+  const stats = data.stats;
+  const composition = data.composition;
+  const growth = data.growth;
+  const totalDebt = stats.totalDebt;
   const totalMU = totalDebt / MU.elonNetWorth;
-  const publicMU = publicDebt / MU.elonNetWorth;
-  const intragovMU = intragovDebt / MU.elonNetWorth;
   
-  // Update main display
-  document.getElementById('debt-usd-main').textContent = '$' + (totalDebt / 1e12).toFixed(2) + 'T';
+  // ==========================================================================
+  // HERO CARDS
+  // ==========================================================================
+  
+  document.getElementById('debt-usd-main').textContent = fmtT(totalDebt);
   document.getElementById('debt-musks').textContent = totalMU.toFixed(1);
-  document.getElementById('debt-date').textContent = recordDate;
-  document.getElementById('debt-per-musk').textContent = '$' + (MU.elonNetWorth / 1e9).toFixed(0) + 'B';
+  document.getElementById('debt-gdp-ratio').textContent = stats.debtToGdpRatio.toFixed(0) + '%';
+  document.getElementById('debt-interest').textContent = fmtB(stats.annualInterest);
   
-  // Debt to GDP ratio
-  if (gdp > 0) {
-    const debtToGdp = (totalDebt / gdp) * 100;
-    document.getElementById('debt-gdp-ratio').textContent = debtToGdp.toFixed(1) + '%';
-  }
+  // Interest per day
+  const interestPerDay = (stats.annualInterest * 1e9) / 365;
+  document.getElementById('interest-per-day').textContent = '$' + (interestPerDay / 1e9).toFixed(2) + 'B/day';
   
-  // Interest payments
-  if (interestPayments > 0) {
-    const interestDisplay = interestPayments >= 1000 
-      ? '$' + (interestPayments / 1000).toFixed(2) + 'T/yr'
-      : '$' + interestPayments.toFixed(0) + 'B/yr';
-    document.getElementById('debt-interest').textContent = interestDisplay;
-  }
+  // Debt growing per second (based on annual increase)
+  const perSecond = growth.annualIncrease / (365 * 24 * 60 * 60);
+  document.getElementById('debt-per-second').textContent = '$' + fmt(Math.round(perSecond));
   
-  // Breakdown
-  document.getElementById('debt-public').textContent = '$' + (publicDebt / 1e12).toFixed(2) + 'T';
-  document.getElementById('debt-public-mu').textContent = publicMU.toFixed(1) + ' MU';
-  document.getElementById('debt-intragov').textContent = '$' + (intragovDebt / 1e12).toFixed(2) + 'T';
-  document.getElementById('debt-intragov-mu').textContent = intragovMU.toFixed(1) + ' MU';
+  // ==========================================================================
+  // YOUR SHARE
+  // ==========================================================================
   
-  // Context text
-  document.getElementById('context-text').innerHTML = 
-    `The US national debt is equivalent to <strong>${totalMU.toFixed(1)} Elon Musks</strong>. ` +
-    `To pay off the debt, you would need to liquidate Elon's entire net worth <strong>${totalMU.toFixed(0)} times</strong>. ` +
-    `Every American citizen's share of the debt is approximately <strong>$${(totalDebt / 335000000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong>.`;
+  document.getElementById('debt-per-person').textContent = fmtD(stats.perPersonDebt);
+  document.getElementById('debt-per-household').textContent = fmtD(stats.perHouseholdDebt);
+  document.getElementById('debt-per-taxpayer').textContent = fmtD(totalDebt / 150000000);
+  
+  // ==========================================================================
+  // FUN FACTS
+  // ==========================================================================
+  
+  // Years to pay at $1/second
+  const secondsToPayOff = totalDebt;
+  const yearsAtOneDollar = Math.round(secondsToPayOff / (365 * 24 * 60 * 60));
+  document.getElementById('fact-seconds').textContent = fmt(yearsAtOneDollar);
+  
+  // Miles of stacked $100 bills (a $100 bill is 0.0043 inches thick)
+  const numBills = totalDebt / 100;
+  const inchesThick = numBills * 0.0043;
+  const miles = inchesThick / 63360;
+  document.getElementById('fact-bills').textContent = fmt(Math.round(miles));
+  
+  // Years of NASA funding (~$25B/year)
+  const nasaYears = totalDebt / 25e9;
+  document.getElementById('fact-nasa').textContent = fmt(Math.round(nasaYears));
+  
+  // Multiple of UK GDP (~$3.1T)
+  const ukMultiple = totalDebt / 3.1e12;
+  document.getElementById('fact-uk').textContent = ukMultiple.toFixed(1) + 'x';
+  
+  // ==========================================================================
+  // COMPOSITION TABLE
+  // ==========================================================================
+  
+  const privateDomestic = composition.publicDebt - composition.foreignEstimate;
+  
+  document.getElementById('comp-private-amt').textContent = fmtT(privateDomestic);
+  document.getElementById('comp-private').textContent = composition.privatePercent.toFixed(0) + '%';
+  document.getElementById('comp-private-mu').textContent = (privateDomestic / MU.elonNetWorth).toFixed(1);
+  
+  document.getElementById('comp-foreign-amt').textContent = fmtT(composition.foreignEstimate);
+  document.getElementById('comp-foreign').textContent = composition.foreignPercent.toFixed(0) + '%';
+  document.getElementById('comp-foreign-mu').textContent = (composition.foreignEstimate / MU.elonNetWorth).toFixed(1);
+  
+  document.getElementById('comp-trust-amt').textContent = fmtT(composition.intragovDebt);
+  document.getElementById('comp-trust').textContent = composition.intragovPercent.toFixed(0) + '%';
+  document.getElementById('comp-trust-mu').textContent = (composition.intragovDebt / MU.elonNetWorth).toFixed(1);
+  
+  document.getElementById('comp-total-amt').textContent = fmtT(totalDebt);
+  document.getElementById('comp-total-mu').textContent = totalMU.toFixed(1);
 }
 
 // =============================================================================
-// TAB INITIALIZATION
+// INIT
 // =============================================================================
 
-/**
- * Initialize the debt tab (called when tab is shown)
- */
 function initDebtTab() {
   fetchDebtData();
 }
 
-/**
- * Initialize debt tab event listeners (called once on page load)
- */
 function initDebtListeners() {
-  // Debt chart range buttons
   document.querySelectorAll('.debt-range-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.debt-range-btn').forEach(b => b.classList.remove('active'));
@@ -289,7 +255,6 @@ function initDebtListeners() {
     });
   });
   
-  // Interest chart range buttons
   document.querySelectorAll('.interest-range-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.interest-range-btn').forEach(b => b.classList.remove('active'));

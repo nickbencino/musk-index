@@ -53,6 +53,16 @@
   --font-size-2xl: 24px;
   --font-size-3xl: 32px;
   
+  /* Data Tab Typography (scaled up ~150%) */
+  --data-font-xs: 14px;
+  --data-font-sm: 16px;
+  --data-font-base: 18px;
+  --data-font-lg: 22px;
+  --data-font-xl: 28px;
+  --data-font-2xl: 36px;
+  --data-font-3xl: 48px;
+  --data-font-4xl: 64px;
+  
   /* Borders */
   --radius-sm: 2px;
   --radius-md: 4px;
@@ -449,11 +459,11 @@ select option {
 /* Chart Container */
 .chart-container {
   background: var(--bg-panel);
-  border: 1px solid var(--border);
-  padding: var(--space-md);
+  border: 2px solid var(--border);
+  padding: var(--space-lg);
   margin-bottom: var(--space-md);
-  height: 300px;
-  min-height: 250px;
+  height: 400px;
+  min-height: 350px;
 }
 
 /* Explainer Boxes */
@@ -659,9 +669,14 @@ tr:hover td {
    ============================================================================= */
 
 /* Shared Container */
-.holders-container,
-.debt-container {
+.holders-container {
   max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-md) 0;
+}
+
+.debt-container {
+  max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-md) 0;
 }
@@ -854,17 +869,17 @@ tr:hover td {
 /* Breakdown Section */
 .debt-breakdown {
   background: var(--bg-panel);
-  border: 1px solid var(--border);
-  padding: var(--space-md);
-  margin-bottom: var(--space-lg);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
 }
 
 .breakdown-title {
-  font-size: var(--font-size-xs);
+  font-size: var(--data-font-lg);
   color: var(--orange);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: var(--space-md);
+  letter-spacing: 2px;
+  margin-bottom: var(--space-lg);
   font-weight: bold;
 }
 
@@ -903,17 +918,17 @@ tr:hover td {
 /* Chart Section */
 .debt-chart-section {
   background: var(--bg-panel);
-  border: 1px solid var(--border);
-  padding: var(--space-md);
-  margin-bottom: var(--space-lg);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
 }
 
 .debt-chart-section .breakdown-title {
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
 }
 
 .debt-chart-section .time-range {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 /* Context */
@@ -936,6 +951,443 @@ tr:hover td {
   color: var(--text-dim);
   line-height: 1.6;
   font-size: var(--font-size-sm);
+}
+
+/* =============================================================================
+   DEBT TAB - BLOOMBERG TERMINAL STYLE
+   ============================================================================= */
+
+/* Debt Cards Grid */
+.debt-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  align-items: stretch;
+}
+
+.debt-card {
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.debt-card.featured {
+  border-color: var(--orange);
+  border-width: 3px;
+  grid-column: span 2;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.debt-card .card-header {
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: var(--space-sm);
+}
+
+.debt-card .card-value {
+  font-size: var(--data-font-3xl);
+  font-weight: bold;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.debt-card.featured .card-value {
+  font-size: var(--data-font-4xl);
+}
+
+.debt-card .card-value.red { color: var(--red); }
+.debt-card .card-value.orange { color: var(--orange); }
+
+.debt-card .card-sub {
+  font-size: var(--data-font-sm);
+  color: var(--amber);
+  margin-top: var(--space-sm);
+}
+
+.debt-card.featured .card-sub {
+  font-size: var(--data-font-lg);
+}
+
+/* Per Capita Section */
+.debt-per-capita {
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.capita-title {
+  font-size: var(--data-font-lg);
+  color: var(--orange);
+  letter-spacing: 2px;
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  font-weight: bold;
+}
+
+.capita-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.capita-item {
+  text-align: center;
+}
+
+.capita-label {
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 1px;
+}
+
+.capita-value {
+  font-size: var(--data-font-3xl);
+  font-weight: bold;
+  color: var(--red);
+  font-family: var(--font-mono);
+}
+
+.capita-sub {
+  font-size: var(--data-font-xs);
+  color: var(--text-dim);
+  margin-top: var(--space-sm);
+}
+
+/* Fun Facts Section */
+.debt-fun-facts {
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.facts-title {
+  font-size: var(--data-font-lg);
+  color: var(--amber);
+  letter-spacing: 2px;
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  font-weight: bold;
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.fact-card {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.fact-value {
+  font-size: var(--data-font-2xl);
+  font-weight: bold;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-sm);
+}
+
+.fact-label {
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+/* Charts Grid */
+.debt-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+/* Debt Table */
+.debt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--data-font-base);
+}
+
+.debt-table th,
+.debt-table td {
+  padding: var(--space-md);
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.debt-table th {
+  color: var(--text-dim);
+  font-size: var(--data-font-sm);
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+
+.debt-table td {
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.debt-table td:nth-child(2),
+.debt-table td:nth-child(3),
+.debt-table td:nth-child(4) {
+  text-align: right;
+}
+
+.debt-table th:nth-child(2),
+.debt-table th:nth-child(3),
+.debt-table th:nth-child(4) {
+  text-align: right;
+}
+
+.debt-table .total-row {
+  font-weight: bold;
+  border-top: 3px solid var(--border);
+}
+
+.debt-table .total-row td {
+  color: var(--amber);
+}
+
+/* Debt Footer */
+.debt-footer {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--text-dim);
+  font-size: var(--data-font-sm);
+}
+
+/* Debt Duo Grid - Composition + Growth Rate */
+.debt-duo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.debt-composition-bar,
+.debt-growth-gauge {
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  padding: var(--space-xl);
+}
+
+/* Stacked Bar Chart */
+.stacked-bar {
+  display: flex;
+  height: 50px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: var(--space-lg) 0;
+}
+
+.bar-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.bar-segment.domestic { background: var(--blue); }
+.bar-segment.foreign { background: var(--green); }
+.bar-segment.trust { background: var(--purple); }
+
+.bar-label {
+  font-size: var(--data-font-sm);
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+}
+
+.bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.legend-color.domestic { background: var(--blue); }
+.legend-color.foreign { background: var(--green); }
+.legend-color.trust { background: var(--purple); }
+
+.composition-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.comp-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.comp-detail .legend-color {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.detail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detail-text strong {
+  color: var(--text);
+  font-size: var(--data-font-sm);
+}
+
+.detail-text span {
+  color: var(--text-dim);
+  font-size: var(--data-font-xs);
+  line-height: 1.4;
+}
+
+.composition-note {
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.note-highlight {
+  color: var(--red);
+  font-weight: bold;
+}
+
+/* Growth Rate Gauge */
+.gauge-display {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.gauge-value {
+  font-size: var(--data-font-4xl);
+  font-weight: bold;
+  color: var(--red);
+  font-family: var(--font-mono);
+}
+
+.gauge-label {
+  font-size: var(--data-font-sm);
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-top: var(--space-xs);
+}
+
+.gauge-bar {
+  height: 24px;
+  background: var(--bg);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid var(--border);
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--red) 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.gauge-marker {
+  position: absolute;
+  top: -8px;
+  width: 4px;
+  height: 40px;
+  background: var(--red);
+  transform: translateX(-50%);
+}
+
+.gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+  font-size: var(--data-font-xs);
+  color: var(--text-dim);
+}
+
+.growth-warning {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: var(--data-font-base);
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.warning-red {
+  color: var(--red);
+  font-weight: bold;
+}
+
+.projection {
+  margin-top: var(--space-sm);
+}
+
+/* Desktop Responsive - Data Tabs */
+@media (min-width: 768px) {
+  .debt-cards {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
+  }
+  
+  .debt-card.featured {
+    grid-column: span 1;
+  }
+  
+  .debt-card .card-value,
+  .debt-card.featured .card-value {
+    font-size: var(--data-font-3xl);
+  }
+  
+  .capita-value {
+    font-size: var(--data-font-3xl);
+  }
+  
+  .facts-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .fact-value {
+    font-size: var(--data-font-2xl);
+  }
+  
+  .debt-charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .debt-duo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* =============================================================================
@@ -1328,4 +1780,64 @@ tr:hover td {
   .hamburger {
     display: none;
   }
+}
+
+/* =============================================================================
+   DATA TABS - YOUTUBE-READY SCALING
+   ============================================================================= */
+
+/* Scale up hero sections for data tabs */
+#debt-tab .hero,
+#holders-tab .hero,
+#gold-tab .hero {
+  padding: var(--space-xl) 0;
+  margin-bottom: var(--space-xl);
+}
+
+#debt-tab .hero h1,
+#holders-tab .hero h1,
+#gold-tab .hero h1 {
+  font-size: var(--data-font-3xl);
+  letter-spacing: 2px;
+  margin-bottom: var(--space-sm);
+}
+
+#debt-tab .tagline,
+#holders-tab .tagline,
+#gold-tab .tagline {
+  font-size: var(--data-font-lg);
+}
+
+/* Bigger range buttons */
+#debt-tab .range-btn,
+#holders-tab .range-btn,
+#gold-tab .range-btn {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--data-font-sm);
+}
+
+/* Bigger holder stats */
+.holders-summary {
+  gap: var(--space-lg);
+}
+
+.holder-stat {
+  padding: var(--space-lg);
+}
+
+.holder-stat-label {
+  font-size: var(--data-font-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.holder-stat-value {
+  font-size: var(--data-font-2xl);
+}
+
+/* Bigger select dropdowns */
+#debt-tab select,
+#holders-tab select,
+#gold-tab select {
+  font-size: var(--data-font-base);
+  padding: var(--space-sm) var(--space-md);
 }
